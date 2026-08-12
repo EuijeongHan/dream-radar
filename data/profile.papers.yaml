@@ -1,0 +1,274 @@
+# data/profile.papers.yaml
+# 논문 채널 관심사 프로파일 — PUBLIC (공개 저장소에 커밋)
+#
+# [언어] 영어로 작성합니다. arXiv 초록이 영어이기 때문입니다.
+#   다국어 임베딩 모델이라도 교차언어 정렬은 동일언어 대비 약하므로,
+#   한국어 프로파일로 영어 초록을 검색하면 랭킹 성능이 떨어집니다.
+#   → 이 가정은 M1 평가에서 profile.papers.ko.yaml과 비교해 실측합니다. (기획안 §7-(2))
+#
+# [text 작성 원칙] 키워드 나열이 아니라 서술문으로 씁니다.
+#   임베딩은 문맥을 봅니다. "diffusion, mask, editing"보다
+#   "image editing with diffusion models while preserving object identity"가
+#   실제 초록과 잘 정렬됩니다.
+#   label은 사람이 읽기 위한 필드이므로 임베딩하지 마세요.
+#
+# [weight] 1.0 = 핵심 관심사(실제 프로젝트에서 직접 다룬 문제)
+#          0.8 = 인접 관심사   0.6 = 주변 관심사
+#
+# [출처] 관심사는 임의 선정이 아니라 본인 프로젝트 5건에서 도출했습니다.
+#   AdNova / 경구약제 객체검출 / BidMate / forG / forG-mini / Image Denoising
+
+version: 1
+channel: papers
+visibility: public
+language: en
+
+interests:
+
+  # ─────────────────────────────────────────────
+  # 1.0 — AdNova에서 직접 부딪힌 문제들
+  # ─────────────────────────────────────────────
+
+  - id: identity_preserving_edit
+    label: "제품·객체 동일성 보존 이미지 편집"
+    weight: 1.0
+    origin: "AdNova — 제품 동일성 DINOv2 0.34 → 0.80"
+    text: >
+      Instruction-guided image editing with diffusion models that preserves the
+      identity of a specific product or object across the edit. Subject-driven
+      generation, reference-image conditioning, background replacement and
+      relighting while keeping the foreground object pixel-faithful. Masking,
+      inpainting control, and quantitative identity metrics such as DINOv2 or
+      CLIP-I similarity between source and generated product.
+
+  - id: text_rendering_cjk
+    label: "생성 이미지 내 텍스트 렌더링 (CJK)"
+    weight: 1.0
+    origin: "AdNova — 한글 철자 붕괴로 조판을 PIL 코드로 분리"
+    text: >
+      Rendering legible and correctly spelled text inside images produced by
+      diffusion or autoregressive generative models, with emphasis on non-Latin
+      scripts such as Korean Hangul, Chinese and Japanese. Glyph-level
+      conditioning, typography-aware layout generation, spelling accuracy
+      benchmarks for generated text, and hybrid approaches that composite
+      programmatically rendered type onto generated backgrounds.
+
+  - id: judge_bias
+    label: "LLM-as-a-Judge 신뢰성과 편향"
+    weight: 1.0
+    origin: "AdNova — Judge 동일가족 편향 실측 / forG-mini — 검증자 분리 설계"
+    text: >
+      Reliability of using large language models as automatic evaluators.
+      Self-preference and same-family bias where a judge model scores outputs
+      from its own model family more favourably, position and verbosity bias,
+      calibration of judge scores against human preference, and evaluation
+      protocols that separate the generator from the verifier to avoid shared
+      failure modes.
+
+  - id: faithfulness_hallucination
+    label: "요약 충실도·환각 탐지"
+    weight: 1.0
+    origin: "forG — DART 공시 요약 / forG-mini — 근거 지지도 점수화"
+    text: >
+      Detecting hallucination and measuring factual consistency between a
+      generated summary and its source document. Groundedness and attribution
+      scoring, claim-level verification, natural language inference based
+      faithfulness metrics, identifying unsupported claims, and automatic gates
+      that block or regenerate summaries that fail a faithfulness threshold.
+
+  - id: rag_retrieval_eval
+    label: "RAG 검색 품질과 평가"
+    weight: 1.0
+    origin: "BidMate — 12조합 전수 비교, Hit@5 0.91"
+    text: >
+      Retrieval quality in retrieval-augmented generation systems. Hybrid
+      retrieval combining sparse BM25 with dense embeddings, reciprocal rank
+      fusion, cross-encoder reranking, chunking strategy and its effect on
+      retrieval, and evaluation of retrievers with Hit@k, MRR and nDCG on
+      domain-specific corpora rather than open-domain benchmarks.
+
+  # ─────────────────────────────────────────────
+  # 0.9 — 직접 다뤘거나 곧 필요한 문제
+  # ─────────────────────────────────────────────
+
+  - id: abstention_rejection
+    label: "근거 없을 때 거절하는 능력"
+    weight: 0.9
+    origin: "BidMate — Rejection을 별도 지표로 측정 (공공 도메인 요구)"
+    text: >
+      Teaching and measuring a model's ability to abstain. Answerability
+      detection, refusing to answer when the retrieved context does not support
+      an answer, selective prediction with confidence estimates, and benchmarks
+      that reward correct abstention instead of penalising it as a miss.
+
+  - id: multilingual_korean_retrieval
+    label: "한국어·다국어 검색과 교차언어 정렬"
+    weight: 0.9
+    origin: "BidMate — KURE-v1 / Radar — 교차언어 손실 실측 예정"
+    text: >
+      Multilingual and Korean-specific text embeddings for retrieval.
+      Cross-lingual alignment quality when the query and the document are in
+      different languages, degradation of cross-lingual retrieval relative to
+      monolingual retrieval, Korean tokenisation and morphology effects, and
+      evaluation resources for Korean information retrieval.
+
+  - id: query_routing
+    label: "질의 유형별 라우팅·적응형 검색"
+    weight: 0.9
+    origin: "BidMate — 맥락형/수치형 질문에 컬렉션 이원화 후 자동 선택"
+    text: >
+      Adaptive retrieval that routes a query to different indexes, chunk sizes
+      or pipelines depending on the type of question being asked. Query
+      classification, deciding whether retrieval is needed at all, multi-index
+      routing, and analysis showing that a single retrieval configuration is
+      suboptimal across heterogeneous query types.
+
+  - id: tool_grounded_numeric
+    label: "수치 계산을 코드에 위임하는 구조"
+    weight: 0.9
+    origin: "forG — 희석률·D-day 계산을 코드가 담당, LLM은 문장만"
+    text: >
+      Preventing numerical and unit errors in language model output by
+      delegating computation to deterministic code or structured APIs instead of
+      letting the model produce the number. Tool use and function calling for
+      arithmetic, verifying model-stated figures against a structured source of
+      truth, and studies quantifying arithmetic and unit-conversion error rates
+      in generated text.
+
+  # ─────────────────────────────────────────────
+  # 0.8 — 인접 영역
+  # ─────────────────────────────────────────────
+
+  - id: efficient_inference
+    label: "추론 경량화·로컬 서빙"
+    weight: 0.8
+    origin: "BidMate — Phi-4-mini 2.25초 vs GEMMA 44.5초 / Denoising 파라미터 -25%"
+    text: >
+      Making language and diffusion models cheap enough to run locally.
+      Quantisation, distillation, pruning, small language models that trade a
+      little quality for a large latency win, batching and KV-cache strategies
+      in serving stacks such as vLLM, and papers that report latency and memory
+      alongside quality rather than quality alone.
+
+  - id: agent_orchestration
+    label: "에이전트 오케스트레이션과 관측성"
+    weight: 0.8
+    origin: "AdNova — 단계별 모델 분리, 전 구간 Langfuse 추적"
+    text: >
+      Orchestrating multi-step language model pipelines as explicit graphs or
+      state machines rather than a single prompt. Assigning different models to
+      different stages, failure handling and retry policy across stages, tracing
+      and observability for LLM applications, and evaluation of a pipeline as a
+      whole rather than per-call.
+
+  - id: data_aug_imbalance
+    label: "데이터 증강과 클래스 불균형"
+    weight: 0.8
+    origin: "경구약제 검출 — Copy-Paste로 소수 클래스 AP +26%p, 다수 클래스 -6~7%p"
+    text: >
+      Data augmentation for object detection under long-tailed class
+      distributions. Copy-paste augmentation, resampling and reweighting for
+      rare classes, and studies that report the trade-off where minority-class
+      performance improves while majority-class performance degrades, rather
+      than reporting only the aggregate metric.
+
+  - id: doc_parsing
+    label: "문서 파싱·표·수식 구조화 추출"
+    weight: 0.8
+    origin: "BidMate — 나라장터 RFP 38,287 청크 / forG — 공시 원문 파싱"
+    text: >
+      Extracting structured content from real-world documents: PDF layout
+      analysis, table detection and table structure recognition, formula
+      extraction, reading order recovery, and building domain corpora from
+      messy institutional documents such as government filings and procurement
+      specifications.
+
+  # ─────────────────────────────────────────────
+  # 0.6 — 주변
+  # ─────────────────────────────────────────────
+
+  - id: gen_eval_metrics
+    label: "생성 이미지 자동 평가 지표"
+    weight: 0.6
+    origin: "AdNova — 자동 지표는 회귀 감지용, 최종 판정은 사람"
+    text: >
+      Automatic evaluation metrics for generated images and their correlation
+      with human judgement. Perceptual similarity, aesthetic predictors,
+      prompt-image alignment scores, and critical work showing where these
+      metrics disagree with human raters and should therefore be used only for
+      regression detection.
+
+  - id: image_restoration
+    label: "이미지 복원·디노이징"
+    weight: 0.6
+    origin: "Image Denoising — PSNR 36.66dB, 파라미터 -25%"
+    text: >
+      Image restoration and denoising with an emphasis on parameter efficiency.
+      Architectures that reach competitive PSNR and SSIM with fewer parameters,
+      real-noise rather than synthetic-noise benchmarks, and restoration as a
+      preprocessing step for downstream recognition tasks.
+
+# ─────────────────────────────────────────────
+# 감점 대상 — 하드 배제가 아니라 감점입니다. (기획안 §7-(4))
+# 경계 사례를 통째로 버리지 않기 위함입니다.
+# ─────────────────────────────────────────────
+exclude:
+  soft:
+    - text: "purely theoretical optimisation with convergence proofs and no empirical system"
+      penalty: 0.8
+    - text: "robotics control, manipulation, autonomous driving"
+      penalty: 0.8
+    - text: "computational biology, protein structure, molecular property prediction"
+      penalty: 0.7
+    - text: "quantum computing"
+      penalty: 0.9
+    - text: "position paper or opinion piece with no experiment"
+      penalty: 0.5
+    - text: "survey"
+      penalty: 0.3          # 서베이는 완전 배제하지 않음 — 분야 입문에 유용
+
+sources:
+  arxiv:
+    enabled: true
+    endpoint: "http://export.arxiv.org/api/query"
+    # [필수] 3초에 1회, 단일 커넥션. 여러 머신에 분산해도 합산 적용됩니다.
+    #        권장이 아니라 API 이용약관상 요구사항입니다. 위반 시 차단됩니다.
+    min_interval_sec: 3.0
+    max_connections: 1
+    categories:
+      - cs.CL
+      - cs.CV
+      - cs.LG
+      - cs.IR
+      - cs.AI
+    sort_by: "submittedDate"
+    sort_order: "descending"
+    max_results: 100
+    window_hours: 48        # 주말·공휴일 공백 대비
+
+  hf_daily_papers:
+    enabled: true
+    note: "큐레이션된 하루 10~30편. 1차 후보 보강용"
+
+# ─────────────────────────────────────────────
+# 라이선스 게이트 (기획안 델타 §D1)
+#   서술 메타데이터(제목·초록)는 CC0 1.0 → 요약·번역·게시 자유
+#   전문(PDF)은 논문별 상이 → 저장·서빙 금지
+#   라이선스 필드는 Search API에 없고 OAI-PMH에만 있으므로,
+#   선택된 top-N에 대해서만 조회합니다 (100건 전부 조회하면 300초 소요)
+# ─────────────────────────────────────────────
+license_gate:
+  fulltext_ok_licenses:
+    - "http://creativecommons.org/publicdomain/zero/1.0/"
+    - "http://creativecommons.org/licenses/by/4.0/"
+    - "http://creativecommons.org/licenses/by-sa/4.0/"
+  default_fulltext_ok: false
+  lookup: "oai-pmh"
+  lookup_scope: "selected_only"
+
+selection:
+  stage1_top_n: 30
+  final_n: 5
+  # 고정 N이 아니라 임계 병행 — 조용한 날 억지로 5건을 채우지 않습니다.
+  # 임계값은 M1 평가로 결정합니다. 초기값은 잠정치입니다.
+  min_score_threshold: 0.42

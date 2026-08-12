@@ -1,0 +1,29 @@
+# ─── 법적·약관 게이트. 지우지 마세요. tests/test_gates.py 가 검사합니다 ───
+# 구직 조건 노출 방지 (기획안 §7, 델타 §D4)
+data/profile.jobs.yaml
+data/profile.jobs_*.yaml
+# 채용공고 원문 커밋 금지 (기획안 §2, §8 M5)
+data/jobs/
+# arXiv 전문 저장 금지 (델타 §D1)
+*.pdf
+# 벤더 문서 (사람인·워크넷 배포 자료)
+docs/_reference/
+# ──────────────────────────────────────────────────────────────
+# 상태·캐시
+data/state.db
+data/candidates/
+data/cache/
+.env
+.env.*
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+# Hugo
+site/public/
+site/resources/
+# macOS
+.DS_Store
