@@ -1,0 +1,24 @@
+# M1 평가 전용 의존성 — **로컬에서만 설치합니다. Actions에 넣지 마세요.**
+#
+# 왜 requirements.txt 와 분리했는가 (기획안 §5.1-(1), 델타 §D6.3)
+# --------------------------------------------------------------
+# 기획안 §5.1-(1)은 "Actions 러너에서 로컬 임베딩을 돌리지 않는다"고 결정했습니다.
+# 러너가 4 vCPU·GPU 없음이라 500건 CPU 인코딩이 실행시간의 대부분을 잡아먹기 때문입니다.
+# 이 결정은 유효합니다.
+#
+# 그런데 M1 **평가**는 Actions가 아니라 본인 맥에서 한 번 돌리는 배치 작업이라
+# 로컬 임베딩을 씁니다 (델타 §D6.3). 두 사실이 충돌하지 않으려면 의존성이 분리돼야
+# 합니다. 한 파일에 두면 매일 도는 Actions가 매번 torch 1GB를 설치합니다.
+#
+#   requirements.txt       운영 (Actions 매일) — 임베딩은 API
+#   requirements-eval.txt  평가 (로컬 1회성)   — 임베딩은 bge-m3 로컬
+#
+# tests/test_gates.py::test_actions_requirements_have_no_local_models 가 이 분리를
+# 강제합니다. 지우면 게이트가 빨간불이 됩니다.
+#
+# 설치:
+#   pip install -r requirements-eval.txt
+
+torch==2.9.1
+sentence-transformers==5.1.2
+transformers==4.57.1

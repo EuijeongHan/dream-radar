@@ -13,6 +13,8 @@ docs/_reference/
 data/state.db
 data/candidates/
 data/cache/
+# arXiv 레이트리미터 락 (델타 §D2 / 결정_M0 §5)
+data/.arxiv_lock
 .env
 .env.*
 # Python

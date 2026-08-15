@@ -1,0 +1,19 @@
+[project]
+name = "radar"
+version = "0.1.0"
+description = "매일 arXiv 논문과 채용공고를 선별·요약해 전달하는 개인 파이프라인"
+# 기획안 §5 확정값. 결정_M0 §2 — conda 환경 이름만으로는 고정되지 않으므로
+# pyproject / .python-version / workflows 3곳에 명시한다.
+requires-python = ">=3.11,<3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "network: arXiv API에 실제로 접속하는 테스트. 기본 실행에서 제외한다 (델타 §D2 — 로컬 테스트와 크론이 겹치면 합산 위반)",
+]
+addopts = "-m 'not network' --strict-markers"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
