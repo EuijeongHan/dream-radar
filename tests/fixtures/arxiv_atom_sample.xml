@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  arXiv Search API 응답 샘플 (축약).
+  키 없이 파서를 테스트하기 위한 픽스처입니다 — 델타 §D2가 "로컬 테스트와 크론이
+  겹치면 합산 위반"이라고 못박았으므로, 기본 테스트는 네트워크를 쓰지 않습니다.
+
+  일부러 넣어둔 것 3개:
+    - entry 2는 v3 (버전 접미사 제거 확인)
+    - entry 3은 published 가 오래됨 (창 필터 확인)
+    - 모든 entry에 pdf link 존재 (파싱은 하되 저장하지 않는지 확인, 델타 §D1)
+-->
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title type="html">ArXiv Query</title>
+  <opensearch:totalResults xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">51234</opensearch:totalResults>
+
+  <entry>
+    <id>http://arxiv.org/abs/2608.01234v1</id>
+    <updated>2026-08-11T17:41:02Z</updated>
+    <published>2026-08-11T17:41:02Z</published>
+    <title>Cross-Encoder Reranking for Domain-Specific
+      Retrieval Evaluation</title>
+    <summary>  We study reranking on domain corpora and report Hit@5 and nDCG
+gains over a dense-only baseline.
+</summary>
+    <author><name>Jane Researcher</name></author>
+    <author><name>Kim Minsu</name></author>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">9 pages, 3 figures</arxiv:comment>
+    <link href="http://arxiv.org/abs/2608.01234v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2608.01234v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cs.IR"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+
+  <entry>
+    <id>http://arxiv.org/abs/2608.05678v3</id>
+    <updated>2026-08-12T02:10:44Z</updated>
+    <published>2026-08-11T09:00:00Z</published>
+    <title>Same-Family Bias in LLM-as-a-Judge Evaluation</title>
+    <summary>  Judges score outputs from their own model family more favourably.
+</summary>
+    <author><name>Alex Kim</name></author>
+    <link href="http://arxiv.org/abs/2608.05678v3" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2608.05678v3" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cs.CL"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+
+  <entry>
+    <id>http://arxiv.org/abs/2601.00001v1</id>
+    <updated>2026-01-02T08:00:00Z</updated>
+    <published>2026-01-02T08:00:00Z</published>
+    <title>An Old Paper Outside The Collection Window</title>
+    <summary>  This entry exists to verify the window filter.
+</summary>
+    <author><name>Old Author</name></author>
+    <link href="http://arxiv.org/abs/2601.00001v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2601.00001v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cs.LG"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>
