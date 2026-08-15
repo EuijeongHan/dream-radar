@@ -1,0 +1,148 @@
+# 의도적으로 왜곡한 요약 3건 — 기획안 §8 M2 DoD
+#
+#   "의도적으로 왜곡한 요약 3건을 검증자가 모두 잡아내는 테스트 통과"
+#
+# 델타 §D6.4가 이 3건을 **키가 오기 전에 손으로 만들어 두라**고 했습니다.
+# 키가 도착하면 그날 바로 DoD를 판정할 수 있게 하기 위함입니다.
+# 왜곡 유형은 서로 달라야 합니다 — ① 수치 조작 ② 없는 인과 ③ 한계를 성과로 반전.
+#
+# [설계] 원문 하나에 요약 4개(정상 1 + 왜곡 3)를 답니다. 원문을 고정해야 왜곡만이
+#   유일한 변수가 되고, 검증자가 왜곡을 잡은 건지 원문이 어려웠던 건지 구분됩니다.
+#
+# [원문 출처] 2026-08-12 수집분에서 고른 실제 arXiv 초록입니다.
+#   arXiv 서술 메타데이터(제목·초록)는 CC0 1.0 이므로 저장·재배포에 제약이 없습니다
+#   (델타 §D1). 전문은 받지 않았습니다.
+#
+# [detectable_by] 어떤 검증자가 잡을 수 있어야 하는가.
+#   rulebased_fake 는 수치만 봅니다. ②③을 못 잡는 건 버그가 아니라 설계입니다
+#   (src/verify/faithfulness.py 주석 참조). 규칙으로 흉내 내면 하한선 베이스라인의
+#   자격을 잃습니다.
+
+source:
+  item_id: "arxiv:2608.11053"
+  title: >-
+    A Comparative Evaluation of Deep Learning Object Detection Models on a
+    Real-World Multi-Plant Dataset from Africa
+  url: "https://arxiv.org/abs/2608.11053"
+  abstract: >-
+    The application of computer vision in agriculture has shown significant
+    potential for improving crop monitoring and precision farming. However, many
+    existing approaches rely on controlled datasets that do not adequately
+    represent realworld farming conditions, particularly in underrepresented
+    regions such as Africa. This study presents a comparative evaluation of six
+    object detection models YOLOv5, YOLOv8, YOLO11, YOLO26, Faster R-CNN, and
+    RT-DETR using a real-world dataset, AgriAISeg 1 , collected manually from
+    Nigerian farms. AgriAISeg comprises 3,382 images of sesame, cabbage, and
+    tomato crops captured under varying environmental conditions, including
+    changes in illumination, occlusion, and viewing perspectives. Models were
+    trained, and performance was assessed using precision, recall, mAP@0.5, and
+    mAP@0.5:0.95. The results show that RT-DETR achieved the highest overall
+    performance with a precision of 0.768 and mAP@0.5:0.95 of 0.624, while
+    YOLOv8 and YOLO11 also demonstrated strong and consistent performance. In
+    contrast, Faster R-CNN recorded significantly lower accuracy, with an
+    overall mAP@0.5 of 0.466, indicating reduced effectiveness under complex
+    field conditions. In addition, YOLO-based models exhibited superior training
+    efficiency compared to Faster R-CNN. These findings demonstrate that modern
+    one-stage and transformer-based detectors provide more reliable and
+    efficient solutions for plant detection in realworld agricultural
+    environments.
+
+# ── 대조군: 왜곡 없는 요약 ────────────────────────────────────────────────
+# 검증자가 이걸 통과시키지 못하면 위양성(false positive)이 너무 높은 것입니다.
+# 왜곡을 잡는 능력만큼 정상을 통과시키는 능력도 검증해야 합니다.
+faithful:
+  label: "정상 요약 — 왜곡 없음"
+  expect_pass: true
+  expect_types: []
+  detectable_by: []
+  summary:
+    problem: >-
+      농업 컴퓨터비전 연구가 통제된 데이터셋에 의존해 실제 농장 환경, 특히 아프리카처럼
+      과소대표된 지역의 조건을 충분히 반영하지 못하는 문제.
+    method: >-
+      나이지리아 농장에서 직접 수집한 실제 데이터셋 AgriAISeg으로 객체 검출 모델 6종
+      (YOLOv5, YOLOv8, YOLO11, YOLO26, Faster R-CNN, RT-DETR)을 비교 평가. 데이터셋은
+      참깨·양배추·토마토 이미지 3,382장이며 조명·가림·시점 변화를 포함한다.
+    key_results:
+      - "RT-DETR이 최고 성능. precision 0.768, mAP@0.5:0.95 0.624."
+      - "YOLOv8과 YOLO11도 강하고 일관된 성능을 보였다."
+      - "Faster R-CNN은 mAP@0.5 0.466으로 정확도가 뚜렷하게 낮았다."
+      - "YOLO 계열이 Faster R-CNN보다 학습 효율이 우수했다."
+    limitations: []
+    connection: >-
+      경구약제 객체검출에서 다뤘던 실제 촬영 조건(조명·가림) 문제와 같은 축이다.
+
+# ── ① 수치 조작 ─────────────────────────────────────────────────────────
+distortions:
+  - id: numeric_inflation
+    label: "① 수치 조작 — 성능 수치를 부풀림"
+    expect_pass: false
+    expect_types: ["numeric"]
+    detectable_by: ["rulebased_fake", "llm"]
+    note: >-
+      0.768 → 0.82, 0.624 → 0.71, 0.466 → 0.52 로 바꿨습니다. 반올림처럼 보이지만
+      전부 원문보다 높은 방향입니다. 검증자가 "대략 맞다"고 넘기면 실패입니다.
+    summary:
+      problem: >-
+        농업 컴퓨터비전 연구가 통제된 데이터셋에 의존해 실제 농장 조건을 반영하지 못하는 문제.
+      method: >-
+        나이지리아 농장에서 수집한 AgriAISeg 데이터셋으로 객체 검출 모델 6종을 비교 평가.
+        참깨·양배추·토마토 이미지 3,382장.
+      key_results:
+        - "RT-DETR이 최고 성능. precision 0.82, mAP@0.5:0.95 0.71."
+        - "Faster R-CNN은 mAP@0.5 0.52로 상대적으로 낮았다."
+      limitations: []
+      connection: "실제 촬영 조건에서의 검출 성능 저하 문제와 연결된다."
+
+  # ── ② 없는 인과 주장 ──────────────────────────────────────────────────
+  - id: fabricated_causality
+    label: "② 없는 인과 — 원문에 없는 메커니즘 설명을 추가"
+    expect_pass: false
+    expect_types: ["causal"]
+    detectable_by: ["llm"]
+    note: >-
+      원문은 RT-DETR이 가장 좋았다는 **관측**만 말합니다. 왜 좋았는지는 초록에 없습니다.
+      아래 요약은 "어텐션이 가림 문제를 처리하기 때문"이라는 메커니즘을 지어냈습니다.
+      수치는 전부 정확하므로 **규칙 검증자는 이걸 통과시킵니다.** 그게 의도된 결과입니다.
+    summary:
+      problem: >-
+        농업 컴퓨터비전이 통제된 데이터셋에 의존해 실제 농장 조건을 반영하지 못하는 문제.
+      method: >-
+        나이지리아 농장에서 수집한 AgriAISeg(3,382장)으로 객체 검출 모델 6종을 비교 평가.
+      key_results:
+        - >-
+          RT-DETR이 precision 0.768, mAP@0.5:0.95 0.624로 최고 성능을 기록했는데, 이는
+          트랜스포머의 어텐션 메커니즘이 가림(occlusion) 상황에서 전역 문맥을 활용해
+          객체를 복원하기 때문이다.
+        - >-
+          Faster R-CNN이 mAP@0.5 0.466에 그친 것은 2단계 구조의 region proposal이
+          밀집된 잎 배경에서 후보 영역을 놓치기 때문이다.
+      limitations: []
+      connection: "검출 아키텍처 선택이 실제 촬영 조건에 좌우된다는 점에서 연결된다."
+
+  # ── ③ 한계를 성과로 반전 ──────────────────────────────────────────────
+  - id: limitation_reversal
+    label: "③ 한계 반전 — 낮은 성능을 긍정적 결과로 뒤집음"
+    expect_pass: false
+    expect_types: ["reversal"]
+    detectable_by: ["llm"]
+    note: >-
+      원문은 Faster R-CNN이 "significantly lower accuracy"이고 "reduced effectiveness
+      under complex field conditions"라고 명시합니다. 아래 요약은 이를 "모든 모델이
+      견고했다"로 뒤집고, 원문이 없다고 한 통제 조건 의존성도 해결된 것처럼 썼습니다.
+      수치 0.466은 그대로 인용해서 **규칙 검증자는 통과시킵니다.**
+    summary:
+      problem: >-
+        농업 컴퓨터비전 모델이 실제 농장 조건에서 어떻게 동작하는지에 대한 비교 근거 부족.
+      method: >-
+        나이지리아 농장에서 수집한 AgriAISeg(3,382장)으로 객체 검출 모델 6종을 비교 평가.
+      key_results:
+        - "RT-DETR이 precision 0.768, mAP@0.5:0.95 0.624로 가장 우수했다."
+        - >-
+          Faster R-CNN도 mAP@0.5 0.466으로 안정적인 성능을 보여, 2단계 검출기가 복잡한
+          야외 조건에서도 여전히 경쟁력이 있음을 확인했다.
+        - >-
+          여섯 모델 모두 조명·가림·시점 변화에 견고했으며, 통제된 데이터셋에 의존하던
+          기존 접근의 한계가 해소되었다.
+      limitations: []
+      connection: "검출 모델의 실제 조건 견고성이라는 축에서 연결된다."
