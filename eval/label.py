@@ -205,11 +205,13 @@ def progress_bar(done: int, total: int, width: int = 40) -> str:
 TRIAGE_HELP = f"""{BOLD}1패스 — 제목만 보고 거릅니다{RESET}
   {BOLD}n{RESET} / {BOLD}space{RESET}  무관     (relevant=false, basis=title)
   {BOLD}k{RESET}            보류     (2패스에서 초록을 읽고 판정)
+  {BOLD}a{RESET}            초록 펼치기 — 그 자리에서 y/n/k 판정 (basis=abstract 로 기록)
   {BOLD}u{RESET}            직전 취소
   {BOLD}q{RESET}            저장하고 종료 (다시 실행하면 이어서 합니다)
 
 {DIM}확신이 없으면 k 입니다. 1패스의 목적은 판정이 아니라 '초록을 읽을 가치가 있는가'입니다.
-제목만으로 무관이 확실한 것만 n 하세요.{RESET}
+제목만으로 무관이 확실한 것만 n 하세요. a 를 남발하면 1패스의 속도 이점이 사라집니다 —
+"제목이 애매한데 지금 궁금한" 것에만 쓰세요.{RESET}
 """
 
 
@@ -255,7 +257,27 @@ def run_triage(date: str, journal_path: Path | None = None) -> None:
             # 취소는 드물게 일어나므로 여기서만 원장을 다시 읽습니다.
             decided = latest_by_item(load_journal(journal_path))
             continue
-        if key == "k":
+        if key == "a":
+            # 초록을 펼쳐 이 항목만 2패스 판정으로 전환합니다. 초록을 읽고 내린
+            # 판정은 basis=abstract 로 기록해야 정직합니다 — basis=title 로 남기면
+            # recheck 의 "제목만 보고 놓쳤는가" 측정이 오염됩니다.
+            print()
+            print(_wrap(item["abstract"], 72))
+            print()
+            print(f"{DIM}{item['url']}{RESET}")
+            sys.stdout.write(f"{BOLD}y{RESET} 관련 / {BOLD}n{RESET} 무관 / {BOLD}k{RESET} 보류: ")
+            sys.stdout.flush()
+            sub = ""
+            while sub not in ("y", "n", "k"):
+                sub = read_key()
+                if sub == "q":
+                    print("\n저장했습니다. 같은 명령으로 이어서 하세요.")
+                    return
+            if sub == "k":
+                label = Label(item["id"], date, item["title"], None, "title")
+            else:
+                label = Label(item["id"], date, item["title"], sub == "y", "abstract")
+        elif key == "k":
             label = Label(item["id"], date, item["title"], None, "title")
         elif key in ("n", " ", "\r", "\n"):
             label = Label(item["id"], date, item["title"], False, "title")

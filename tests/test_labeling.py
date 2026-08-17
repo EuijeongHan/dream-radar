@@ -310,3 +310,52 @@ def test_load_candidates_dedupes_repeated_lines(workspace):
     items = L.load_candidates("2026-08-12")
     assert len(items) == 5
     assert len({i["id"] for i in items}) == 5
+
+
+# ── 1패스 초록 펼치기 (a 키) ─────────────────────────────────────────────
+
+
+def test_triage_abstract_peek_records_abstract_basis(workspace, monkeypatch):
+    """`a`로 초록을 읽고 내린 판정은 basis=abstract 로 기록돼야 합니다.
+
+    basis=title 로 남기면 recheck 의 "제목만 보고 놓쳤는가" 측정이 오염됩니다.
+    """
+    write_candidates(workspace, "2026-08-12", 3)
+    feed(monkeypatch, "ayann")  # a→y (관련) · a→n (무관) · n (제목 기각)
+    L.run_triage("2026-08-12", workspace["journal"])
+
+    decided = L.latest_by_item(L.load_journal(workspace["journal"]))
+    assert len(decided) == 3
+    outcomes = sorted((r["relevant"], r["basis"]) for r in decided.values())
+    assert outcomes == [(False, "abstract"), (False, "title"), (True, "abstract")]
+
+
+def test_triage_abstract_peek_can_still_defer(workspace, monkeypatch):
+    """초록을 보고도 애매하면 k — 보류는 basis=title 로 남아 2패스 대상이 됩니다."""
+    write_candidates(workspace, "2026-08-12", 2)
+    feed(monkeypatch, "akn")
+    L.run_triage("2026-08-12", workspace["journal"])
+    decided = L.latest_by_item(L.load_journal(workspace["journal"]))
+    pending = [r for r in decided.values() if r["relevant"] is None]
+    assert len(pending) == 1
+    assert pending[0]["basis"] == "title"
+
+
+def test_triage_abstract_peek_ignores_stray_keys(workspace, monkeypatch):
+    """펼친 상태에서 y/n/k/q 외의 키는 무시됩니다."""
+    write_candidates(workspace, "2026-08-12", 1)
+    feed(monkeypatch, "axzy")  # a → 잘못된 키 2번 → y
+    L.run_triage("2026-08-12", workspace["journal"])
+    decided = L.latest_by_item(L.load_journal(workspace["journal"]))
+    assert list(decided.values())[0]["relevant"] is True
+
+
+def test_recheck_pool_excludes_abstract_peeked_rejects(workspace, monkeypatch):
+    """`a`로 초록까지 읽고 기각한 항목은 재검토 표본에 들어가면 안 됩니다."""
+    write_candidates(workspace, "2026-08-12", 4)
+    feed(monkeypatch, "an" + "nnn")  # 1건은 초록 보고 기각, 3건은 제목 기각
+    L.run_triage("2026-08-12", workspace["journal"])
+    feed(monkeypatch, "nnn")
+    L.run_recheck("2026-08-12", sample=10, journal_path=workspace["journal"])
+    rechecked = [r for r in L.load_journal(workspace["journal"]) if r["basis"] == "recheck"]
+    assert len(rechecked) == 3, "초록 기각분이 재검토 표본에 섞였습니다"
