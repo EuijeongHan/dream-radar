@@ -359,3 +359,67 @@ def test_recheck_pool_excludes_abstract_peeked_rejects(workspace, monkeypatch):
     L.run_recheck("2026-08-12", sample=10, journal_path=workspace["journal"])
     rechecked = [r for r in L.load_journal(workspace["journal"]) if r["basis"] == "recheck"]
     assert len(rechecked) == 3, "초록 기각분이 재검토 표본에 섞였습니다"
+
+
+# ── 번역 병기 ────────────────────────────────────────────────────────────
+
+
+def write_translations(workspace, date: str, n: int) -> None:
+    tdir = workspace["candidates"].parent / "translations"
+    tdir.mkdir(exist_ok=True)
+    import json as _json
+
+    with (tdir / f"{date}.jsonl").open("w", encoding="utf-8") as fp:
+        for i in range(n):
+            fp.write(
+                _json.dumps(
+                    {
+                        "id": f"arxiv:{date}.{i:04d}",
+                        "title_ko": f"논문 {i} 한국어 제목",
+                        "abstract_ko": f"논문 {i}의 한국어 초록입니다.",
+                    },
+                    ensure_ascii=False,
+                )
+                + "\n"
+            )
+    return tdir
+
+
+def test_triage_shows_translated_title(workspace, monkeypatch, capsys):
+    write_candidates(workspace, "2026-08-12", 2)
+    tdir = write_translations(workspace, "2026-08-12", 2)
+    monkeypatch.setattr(L, "TRANSLATIONS_DIR", tdir)
+    feed(monkeypatch, "nn")
+    L.run_triage("2026-08-12", workspace["journal"])
+    out = capsys.readouterr().out
+    assert "한국어 제목" in out, "번역 제목이 표시되지 않았습니다"
+
+
+def test_review_shows_translated_abstract_with_original(workspace, monkeypatch, capsys):
+    """번역과 원문이 **함께** 보여야 합니다 — 번역 오류를 원문으로 대조할 수 있게."""
+    write_candidates(workspace, "2026-08-12", 1)
+    tdir = write_translations(workspace, "2026-08-12", 1)
+    monkeypatch.setattr(L, "TRANSLATIONS_DIR", tdir)
+    feed(monkeypatch, "k")
+    L.run_triage("2026-08-12", workspace["journal"])
+    feed(monkeypatch, "y")
+    L.run_review("2026-08-12", workspace["journal"])
+    out = capsys.readouterr().out
+    assert "한국어 초록" in out
+    assert "Abstract for paper 0." in out, "영어 원문이 사라졌습니다"
+
+
+def test_tool_works_without_translations(workspace, monkeypatch, capsys):
+    """번역 파일이 없어도 도구는 원문만으로 그대로 동작해야 합니다."""
+    write_candidates(workspace, "2026-08-12", 2)
+    monkeypatch.setattr(L, "TRANSLATIONS_DIR", workspace["candidates"].parent / "no-such-dir")
+    feed(monkeypatch, "kn")
+    L.run_triage("2026-08-12", workspace["journal"])
+    feed(monkeypatch, "n")
+    L.run_review("2026-08-12", workspace["journal"])
+    decided = L.latest_by_item(L.load_journal(workspace["journal"]))
+    assert len(decided) == 2
+
+
+def test_load_translations_missing_returns_empty(workspace):
+    assert L.load_translations("2099-01-01", workspace["candidates"].parent / "nope") == {}

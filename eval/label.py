@@ -154,6 +154,39 @@ def available_dates(candidates_dir: Path | None = None) -> list[str]:
     return sorted(p.stem for p in candidates_dir.glob("*.jsonl"))
 
 
+#: 한국어 번역 병기 파일 (gitignore 대상인 data/cache/ 아래 — 재생성 가능한 파생물).
+#: 번역은 **보조 표시**일 뿐 판정 데이터가 아닙니다. 판정은 사람이 합니다.
+#: 없으면 도구는 원문만으로 그대로 동작합니다.
+TRANSLATIONS_DIR = Path("data/cache/translations")
+
+
+def load_translations(date: str, translations_dir: Path | None = None) -> dict[str, dict[str, str]]:
+    path = (translations_dir or TRANSLATIONS_DIR) / f"{date}.jsonl"
+    if not path.exists():
+        return {}
+    out: dict[str, dict[str, str]] = {}
+    with path.open(encoding="utf-8") as fp:
+        for line in fp:
+            if line.strip():
+                row = json.loads(line)
+                out[row["id"]] = row
+    return out
+
+
+def _print_abstract(item: dict[str, Any], tr: dict[str, str] | None, width: int = 72) -> None:
+    """초록 표시 — 번역이 있으면 한국어를 먼저, 영어 원문을 흐리게 병기합니다.
+
+    원문을 항상 함께 보여주는 이유: 번역 오류가 판정을 흔들 수 있는데, 원문이 옆에
+    있으면 수치·용어를 바로 대조할 수 있습니다 (라벨링_기준 §6 한계 6).
+    """
+    if tr and tr.get("abstract_ko"):
+        print(_wrap(tr["abstract_ko"], width))
+        print()
+        print(f"{DIM}{_wrap(item['abstract'], width)}{RESET}")
+    else:
+        print(_wrap(item["abstract"], width))
+
+
 # ── 터미널 입력 ─────────────────────────────────────────────────────────
 
 
@@ -218,6 +251,7 @@ TRIAGE_HELP = f"""{BOLD}1패스 — 제목만 보고 거릅니다{RESET}
 def run_triage(date: str, journal_path: Path | None = None) -> None:
     journal_path = journal_path or JOURNAL_PATH
     items = load_candidates(date)
+    translations = load_translations(date)
     total = len(items)
     # 판정 상태는 메모리에 들고 갑니다. 키 입력마다 원장 전체를 다시 읽으면
     # 700건 후반부에서 눈에 띄게 느려지고, 느린 도구는 라벨 품질을 떨어뜨립니다.
@@ -237,6 +271,7 @@ def run_triage(date: str, journal_path: Path | None = None) -> None:
             return
 
         item = todo[0]
+        tr = translations.get(item["id"])
         clear()
         print(f"{BOLD}골드셋 라벨링 · 1패스 · {date}{RESET}")
         print(progress_bar(total - len(todo), total))
@@ -244,6 +279,8 @@ def run_triage(date: str, journal_path: Path | None = None) -> None:
         print(TRIAGE_HELP)
         print("─" * 72)
         print(f"{BOLD}{item['title']}{RESET}")
+        if tr and tr.get("title_ko"):
+            print(f"{GREEN}{tr['title_ko']}{RESET}")
         print()
         print(f"{DIM}{', '.join(item['categories'])} · {len(item['authors'])}인 · {item['id']}{RESET}")
         print("─" * 72)
@@ -262,7 +299,7 @@ def run_triage(date: str, journal_path: Path | None = None) -> None:
             # 판정은 basis=abstract 로 기록해야 정직합니다 — basis=title 로 남기면
             # recheck 의 "제목만 보고 놓쳤는가" 측정이 오염됩니다.
             print()
-            print(_wrap(item["abstract"], 72))
+            _print_abstract(item, tr)
             print()
             print(f"{DIM}{item['url']}{RESET}")
             sys.stdout.write(f"{BOLD}y{RESET} 관련 / {BOLD}n{RESET} 무관 / {BOLD}k{RESET} 보류: ")
@@ -300,6 +337,7 @@ REVIEW_HELP = f"""{BOLD}2패스 — 초록을 읽고 판정합니다{RESET}
 def run_review(date: str, journal_path: Path | None = None) -> None:
     journal_path = journal_path or JOURNAL_PATH
     items = {i["id"]: i for i in load_candidates(date)}
+    translations = load_translations(date)
     decided = latest_by_item(load_journal(journal_path))
 
     while True:
@@ -349,10 +387,13 @@ def run_review(date: str, journal_path: Path | None = None) -> None:
         print(progress_bar(done, done + len(pending)))
         print()
         print(REVIEW_HELP)
+        tr = translations.get(item_id)
         print("─" * 72)
         print(f"{BOLD}{item['title']}{RESET}")
+        if tr and tr.get("title_ko"):
+            print(f"{GREEN}{tr['title_ko']}{RESET}")
         print()
-        print(_wrap(item["abstract"], 72))
+        _print_abstract(item, tr)
         print()
         print(f"{DIM}{', '.join(item['categories'])} · {item['url']}{RESET}")
         print("─" * 72)
@@ -408,6 +449,7 @@ def run_recheck(date: str, sample: int = 40, journal_path: Path | None = None) -
     """
     journal_path = journal_path or JOURNAL_PATH
     items = {i["id"]: i for i in load_candidates(date)}
+    translations = load_translations(date)
     decided = latest_by_item(load_journal(journal_path))
 
     rejected = sorted(
@@ -454,10 +496,13 @@ def run_recheck(date: str, sample: int = 40, journal_path: Path | None = None) -
         print(progress_bar(len(picked) - len(todo), len(picked)))
         print()
         print(RECHECK_HELP)
+        tr = translations.get(item_id)
         print("─" * 72)
         print(f"{BOLD}{item['title']}{RESET}")
+        if tr and tr.get("title_ko"):
+            print(f"{GREEN}{tr['title_ko']}{RESET}")
         print()
-        print(_wrap(item["abstract"], 72))
+        _print_abstract(item, tr)
         print()
         print(f"{DIM}{', '.join(item['categories'])} · {item['url']}{RESET}")
         print("─" * 72)
