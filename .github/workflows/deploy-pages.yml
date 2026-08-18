@@ -1,0 +1,67 @@
+# .github/workflows/deploy-pages.yml — Hugo 사이트를 GitHub Pages로 배포 (기획안_2 §7.2, M3)
+#
+# papers 채널만 공개 발행한다. jobs 채널 콘텐츠는 site/에 존재해서는 안 된다
+# (사람인 약관 조항 6 — 무료여도 공개 게시 금지, CLAUDE.md §3-3).
+# 발행 직전 assert_public_scope() 호출은 파이프라인 쪽 책임이다 (기획안_2 §7.2).
+
+name: deploy-pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+  workflow_dispatch:
+
+# 최소 권한 — Pages 배포에 필요한 것만 (contents: read는 checkout용)
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 배포가 겹치지 않게 직렬화. 진행 중인 배포는 취소하지 않는다 (완료 보장)
+concurrency:
+  group: deploy-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout (with theme submodule)
+        uses: actions/checkout@v4
+        with:
+          submodules: true # PaperMod 테마가 git submodule로 들어온다
+          fetch-depth: 0 # Hugo .GitInfo·.Lastmod 계산용
+
+      - name: Install Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "latest"
+          extended: true # PaperMod는 extended 빌드 불필요지만 SCSS 사용 대비
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build site
+        working-directory: site
+        run: hugo --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

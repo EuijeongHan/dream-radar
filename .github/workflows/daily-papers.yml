@@ -1,0 +1,64 @@
+# .github/workflows/daily-papers.yml — papers 채널 일일 실행 (기획안_2 §7.4, M3)
+#
+# GitHub Secrets 이름 목록 (v1.0 §13.3 / 기획안_2 §11.2 — 이름 변경 금지).
+# API 키 미발급 상태라 아직 워크플로에 주입하지 않는다. 키 등록 후 필요한
+# 단계의 env 블록으로만 주입할 것 (값을 코드·로그·원장에 남기지 않는다 — CLAUDE.md §3-2):
+#   OPENAI_API_KEY  ANTHROPIC_API_KEY  OPENROUTER_API_KEY
+#   TELEGRAM_BOT_TOKEN  TELEGRAM_CHAT_ID
+#   SARAMIN_ACCESS_KEY  DATA_GO_KR_SERVICE_KEY  PROFILE_JOBS_YAML
+
+name: daily-papers
+
+on:
+  workflow_dispatch: # 수동 실행 — 디버깅에 필수 (기획안_2 §7.4)
+  # M3 DoD 판정 시 해제. 해제 전 로컬 수집 중단 — arXiv 약관 머신 합산(기획안_2 §9.14)
+  # schedule:
+  #   - cron: "0 22 * * *" # 07:00 KST
+
+# 최적화 금지. 두 실행이 겹치면 arXiv 커넥션이 2개가 된다 —
+# arXiv 약관(3초 1회 + 단일 커넥션, 머신 합산) 위반 (기획안_2 §7.4-3, §9.16)
+concurrency:
+  group: daily-papers
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # pyproject.toml(requires-python ">=3.11,<3.12")·.python-version("3.11")과
+          # 일치해야 한다 — 3곳 중 하나 (기획안_2 §7.4-1)
+          python-version: "3.11"
+
+      # requirements.txt만 설치한다. requirements-eval.txt(torch·sentence-transformers)를
+      # 여기서 설치하면 매일 도는 Actions가 매번 1GB를 받는다 (기획안_2 §9.10).
+      # 평가 의존성은 로컬 1회성 배치 전용이다 (델타 §D6.3).
+      - name: Install runtime deps
+        run: pip install -r requirements.txt
+
+      # 게이트. 실패하면 job이 빨간불로 남아야 한다 — `|| true`·`continue-on-error`로
+      # 조용히 초록불로 두지 않는다 (기획안_2 §7.4-4: "게이트 실패 시 exit 1")
+      - name: Gate — pytest
+        run: python -m pytest -q
+
+      - name: Collect papers
+        run: python -m src.core.pipeline --channel papers --stage collect
+
+      # TODO(M1·M2 완성 후 추가): rank → summarize → publish 단계.
+      # 지금은 pipeline CLI가 --stage collect 외에는 parser.error()로 거부한다
+      # (자산_인벤토리 §2.6). 단계를 열 때 발행 직전 게이트 호출(R5)을 잊지 말 것.
+      # - name: Rank
+      #   run: python -m src.core.pipeline --channel papers --stage rank
+      # - name: Summarize
+      #   run: python -m src.core.pipeline --channel papers --stage summarize
+      # - name: Publish
+      #   run: python -m src.core.pipeline --channel papers --stage publish

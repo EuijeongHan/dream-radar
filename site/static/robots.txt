@@ -1,0 +1,12 @@
+# AI 크롤러 명시적 허용 — 기획안_2 §7.3 목록 그대로
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /

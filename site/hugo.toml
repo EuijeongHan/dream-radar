@@ -1,0 +1,37 @@
+# site/hugo.toml — Radar 공개 사이트 설정 (기획안_2 §7.2·§7.3, v1.0 §5: Hugo + PaperMod)
+#
+# 이 사이트는 papers 채널만 게시합니다.
+# jobs 채널을 여기로 흘리지 않는 이유: 사람인 약관 조항 6(제휴 오인 금지) — 무료여도
+# 공개 게시 금지 (CLAUDE.md §3-3, 기획안_2 §3.2). 발행 직전 assert_public_scope()가 막습니다.
+
+baseURL = "https://euijeonghan.github.io/dream-radar/"
+title = "Radar"
+theme = "PaperMod"
+
+languageCode = "ko"
+defaultContentLanguage = "ko"
+hasCJKLanguage = true
+timeZone = "Asia/Seoul"
+
+# robots.txt 는 static/robots.txt 정적 파일을 그대로 서빙합니다 (기획안_2 §7.3 —
+# AI 크롤러 명시적 허용). enableRobotsTXT 템플릿 생성과 경합하지 않도록 끕니다.
+enableRobotsTXT = false
+
+[pagination]
+pagerSize = 10
+
+[params]
+defaultTheme = "auto"
+ShowReadingTime = true
+ShowShareButtons = false
+ShowPostNavLinks = true
+ShowBreadCrumbs = true
+
+[params.homeInfoParams]
+Title = "Radar"
+Content = "arXiv 신규 논문을 매일 수집해 2단계 랭킹으로 5편을 선별하고, 요약을 다른 계열 모델로 검증한 뒤 게시하는 개인 파이프라인의 공개 아카이브입니다."
+
+[[menus.main]]
+name = "About"
+url = "/about/"
+weight = 10
