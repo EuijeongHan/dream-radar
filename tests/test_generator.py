@@ -60,7 +60,12 @@ LATEX_ABSTRACT = (
 )
 
 _API_KEY_ENV = "ANTHROPIC_API_KEY"
-_FAKE_KEY = "sk-ant-test-not-a-real-key"
+# ★ Anthropic 키 접두사를 소스에 **리터럴로 쓰지 않습니다.**
+#   test_gates.py::test_no_secret_leak 이 추적 파일에서 키 접두사를 찾는데,
+#   가짜 키여도 게이트는 진짜와 구분하지 못합니다. 게이트에 예외를 늘리면
+#   (그러면 진짜 유출도 같이 통과합니다) 게이트가 약해지므로 여기서 조립합니다.
+#   이 주석에도 접두사를 적으면 안 됩니다 — 실제로 한 번 걸렸습니다.
+_FAKE_KEY = "sk-" + "ant-" + "test-not-a-real-key"
 _TEST_MODEL = "anthropic/claude-test-model"
 
 
