@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OAI-PMH GetRecord 응답 샘플 — arXiv 비독점 라이선스 (델타 §D1).
+     "다른 주체·개인의 모든 유형의 재이용을 제한"하는 라이선스입니다. 전문을 저장·서빙할
+     수 없으므로 fulltext_ok 는 False 로 남아야 합니다. arXiv 제출물의 다수가 이것입니다. -->
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2026-08-18T02:11:11Z</responseDate>
+  <request verb="GetRecord" identifier="oai:arXiv.org:2608.01234"
+           metadataPrefix="arXiv">http://export.arxiv.org/oai2</request>
+  <GetRecord>
+    <record>
+      <header>
+        <identifier>oai:arXiv.org:2608.01234</identifier>
+        <datestamp>2026-08-13</datestamp>
+        <setSpec>cs</setSpec>
+      </header>
+      <metadata>
+        <arXiv xmlns="http://arxiv.org/OAI/arXiv/"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ http://arxiv.org/OAI/arXiv.xsd">
+          <id>2608.01234</id>
+          <created>2026-08-12</created>
+          <authors>
+            <author><keyname>Park</keyname><forenames>Sunwoo</forenames></author>
+          </authors>
+          <title>Query Routing under Budget Constraints</title>
+          <categories>cs.CL cs.IR</categories>
+          <license>http://arxiv.org/licenses/nonexclusive-distrib/1.0/</license>
+          <abstract>
+            초록 본문은 이 픽스처의 검사 대상이 아닙니다. 라이선스 원소만 봅니다.
+          </abstract>
+        </arXiv>
+      </metadata>
+    </record>
+  </GetRecord>
+</OAI-PMH>

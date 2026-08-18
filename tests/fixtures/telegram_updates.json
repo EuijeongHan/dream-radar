@@ -1,0 +1,138 @@
+{
+  "_note": [
+    "텔레그램 Bot API getUpdates 응답 샘플 (기획안_2 §8.1 M4). 키 없이 수집 경로를 테스트합니다.",
+    "ok_with_callbacks 의 result 4건 = 버튼 콜백 2건 + 무관 메시지 1건 + 중복 update_id 1건.",
+    "중복 1건(update_id 900001)은 '직전 실행이 offset 을 저장하기 전에 죽어 같은 업데이트가 다시 온' 상황입니다.",
+    "★ 이 파일은 공개 저장소에 커밋됩니다. 채용 콜백의 메시지 본문은 실제 공고가 아니라 가상 문자열입니다",
+    "  — 공고 원문을 공개 게시하면 사람인 약관 조항 6 위반입니다 (CLAUDE.md §3-3).",
+    "id·chat_instance·chat.id 도 실제 값이 아닙니다."
+  ],
+
+  "ok_with_callbacks": {
+    "ok": true,
+    "result": [
+      {
+        "update_id": 900001,
+        "callback_query": {
+          "id": "4382bfdwdsb323b2d9",
+          "from": {
+            "id": 500000001,
+            "is_bot": false,
+            "first_name": "radar-owner",
+            "language_code": "ko"
+          },
+          "message": {
+            "message_id": 1041,
+            "from": {
+              "id": 700000002,
+              "is_bot": true,
+              "first_name": "radar",
+              "username": "radar_fixture_bot"
+            },
+            "chat": {"id": 500000001, "first_name": "radar-owner", "type": "private"},
+            "date": 1786935600,
+            "text": "[논문] CPI-Bench: A Comprehensive, Practical and Intelligent Benchmark for Real-World Image Editing\n\n문제: 기존 벤치마크가 단일 이미지 과제에 머문다.\n\nhttps://arxiv.org/abs/2608.11053",
+            "reply_markup": {
+              "inline_keyboard": [
+                [
+                  {"text": "읽음", "callback_data": "read:arxiv:2608.11053"},
+                  {"text": "스킵", "callback_data": "skip:arxiv:2608.11053"},
+                  {"text": "저장", "callback_data": "save:arxiv:2608.11053"}
+                ]
+              ]
+            }
+          },
+          "chat_instance": "-1000000000000000001",
+          "data": "read:arxiv:2608.11053"
+        }
+      },
+      {
+        "update_id": 900002,
+        "message": {
+          "message_id": 1042,
+          "from": {
+            "id": 500000001,
+            "is_bot": false,
+            "first_name": "radar-owner",
+            "language_code": "ko"
+          },
+          "chat": {"id": 500000001, "first_name": "radar-owner", "type": "private"},
+          "date": 1786936000,
+          "text": "오늘 것 잘 받았어"
+        }
+      },
+      {
+        "update_id": 900003,
+        "callback_query": {
+          "id": "4382bfdwdsb323b2e7",
+          "from": {
+            "id": 500000001,
+            "is_bot": false,
+            "first_name": "radar-owner",
+            "language_code": "ko"
+          },
+          "message": {
+            "message_id": 1043,
+            "from": {
+              "id": 700000002,
+              "is_bot": true,
+              "first_name": "radar",
+              "username": "radar_fixture_bot"
+            },
+            "chat": {"id": 500000001, "first_name": "radar-owner", "type": "private"},
+            "date": 1786936100,
+            "text": "[채용] (픽스처용 가상 공고 — 실제 공고 아님)\n\n추천 사유: (가상)\n\nhttps://example.invalid/jobs/49123456",
+            "reply_markup": {
+              "inline_keyboard": [
+                [
+                  {"text": "읽음", "callback_data": "read:saramin:49123456"},
+                  {"text": "스킵", "callback_data": "skip:saramin:49123456"},
+                  {"text": "저장", "callback_data": "save:saramin:49123456"}
+                ]
+              ]
+            }
+          },
+          "chat_instance": "-1000000000000000001",
+          "data": "save:saramin:49123456"
+        }
+      },
+      {
+        "update_id": 900001,
+        "callback_query": {
+          "id": "4382bfdwdsb323b2d9",
+          "from": {
+            "id": 500000001,
+            "is_bot": false,
+            "first_name": "radar-owner",
+            "language_code": "ko"
+          },
+          "message": {
+            "message_id": 1041,
+            "from": {
+              "id": 700000002,
+              "is_bot": true,
+              "first_name": "radar",
+              "username": "radar_fixture_bot"
+            },
+            "chat": {"id": 500000001, "first_name": "radar-owner", "type": "private"},
+            "date": 1786935600,
+            "text": "[논문] CPI-Bench: A Comprehensive, Practical and Intelligent Benchmark for Real-World Image Editing\n\n문제: 기존 벤치마크가 단일 이미지 과제에 머문다.\n\nhttps://arxiv.org/abs/2608.11053"
+          },
+          "chat_instance": "-1000000000000000001",
+          "data": "read:arxiv:2608.11053"
+        }
+      }
+    ]
+  },
+
+  "webhook_conflict": {
+    "ok": false,
+    "error_code": 409,
+    "description": "Conflict: can't use getUpdates method while webhook is active; use deleteWebhook to delete the webhook first"
+  },
+
+  "empty": {
+    "ok": true,
+    "result": []
+  }
+}
