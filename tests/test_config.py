@@ -7,6 +7,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from src.core.config import DATA_DIR, load_profile, resolve_profile
@@ -49,10 +51,39 @@ def test_profile_resolution_missing_raises(tmp_path):
         resolve_profile("nope", root=tmp_path)
 
 
+def _highest_numbered(stem: str, ext: str = ".yaml") -> str:
+    """`resolve_profile` 과 **독립적으로** 최고 번호 파일을 구합니다.
+
+    같은 구현을 두 번 부르면 순환 검증이 됩니다. 여기서는 정규식으로 직접
+    번호를 뽑아 비교합니다 — 해석기가 틀리면 이 둘이 갈라집니다.
+    """
+    best_n, best = -1, None
+    for candidate in DATA_DIR.glob(f"{stem}*{ext}"):
+        rest = candidate.name[len(stem) : -len(ext)]
+        if rest == "":
+            n = 0
+        elif (m := re.fullmatch(r"_(\d+)", rest)):
+            n = int(m.group(1))
+        else:
+            continue
+        if n > best_n:
+            best_n, best = n, candidate.name
+    return best
+
+
 def test_real_papers_profile_resolves_to_latest():
-    """저장소의 실제 상태. hf_daily_papers 를 끈 `_1`이 선택돼야 합니다."""
+    """저장소의 실제 상태 — **파일명을 못박지 않습니다.**
+
+    프로파일이 갱신되면(_1 → _2 → …) 번호가 올라갑니다. 파일명을 하드코딩하면
+    갱신할 때마다 이 테스트가 깨지고, 그러면 사람이 숫자만 고쳐 통과시키게 됩니다.
+    그건 해석기를 검증하는 게 아니라 통과시키는 것입니다.
+    대신 "해석기가 고른 것 == 실제 최고 번호" 를 검사합니다.
+    """
     profile, path = load_profile("profile.papers")
-    assert path.name == "profile.papers_1.yaml"
+    assert path.name == _highest_numbered("profile.papers"), (
+        "resolve_profile 이 최고 번호를 고르지 못했습니다"
+    )
+    # 번호와 무관하게 유지돼야 하는 설정 (결정_M0 §3)
     assert profile["sources"]["hf_daily_papers"]["enabled"] is False
     assert profile["sources"]["arxiv"]["enabled"] is True
 
