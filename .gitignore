@@ -24,6 +24,10 @@ __pycache__/
 venv/
 .pytest_cache/
 .ruff_cache/
+# Airflow — 로컬 메타DB·로그. DAG 정의(dags/)만 커밋한다
+.airflow/
+# .venv-airflow/ 는 venv 가 자체 .gitignore(*) 를 갖고 있어 별도 규칙이 필요 없다
+
 # Hugo
 site/public/
 site/resources/

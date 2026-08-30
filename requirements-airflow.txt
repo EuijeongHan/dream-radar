@@ -1,0 +1,29 @@
+# Airflow 오케스트레이션 전용 의존성 — 운영 파이프라인(requirements.txt)과 분리한다.
+#
+# 분리하는 이유
+# ------------
+# Airflow는 의존성이 무겁고(설치 255MB) GitHub Actions 러너에는 필요 없다.
+# DAG는 파이프라인 CLI를 호출할 뿐이므로 두 환경이 겹칠 이유가 없다.
+#
+# 설치 (제약 파일 필수) ★
+# ----------------------
+# Airflow는 제약 파일 없이 설치하면 의존성이 깨진다. 공식 constraints 를 반드시 건다.
+#
+#   python -m venv .venv-airflow
+#   .venv-airflow/bin/pip install -r requirements-airflow.txt \
+#     --constraint https://raw.githubusercontent.com/apache/airflow/constraints-3.1.3/constraints-3.13.txt
+#
+# 실행
+# ----
+#   export AIRFLOW_HOME=~/radar/.airflow
+#   export AIRFLOW__CORE__LOAD_EXAMPLES=False       # 예제 DAG가 kubernetes 를 요구한다
+#   export AIRFLOW__CORE__DAGS_FOLDER=~/radar/dags
+#   .venv-airflow/bin/airflow db migrate
+#   .venv-airflow/bin/airflow dags test radar_papers 2026-08-31
+#
+# 검증 기록 (2026-08-31, macOS / Python 3.13.9)
+#   DagBag 임포트 에러 0건
+#   dags test 로 collect 태스크 실제 실행 확인 — 원장에 run 기록 남음
+#   catchup=False · max_active_runs=1 · max_active_tasks=1 파싱값으로 확인
+
+apache-airflow==3.1.3
