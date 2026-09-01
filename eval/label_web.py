@@ -149,9 +149,12 @@ h2{font-size:17px;line-height:1.45}.ko{color:var(--green);font-size:16px;margin-
 .abs .en{color:var(--dim);font-size:13px;margin-top:10px}
 .note{width:100%;margin-top:10px;background:#0d1117;border:1px solid #2d333b;border-radius:8px;color:var(--fg);padding:8px;font-size:14px;display:none}
 .note.show{display:block}
-.btns{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(transparent,var(--bg) 22%);padding:18px 14px 26px;display:flex;gap:10px}
-button{flex:1;border:0;border-radius:12px;padding:16px 6px;font-size:16px;font-weight:700;color:#fff;background:#2d333b}
-.bn{background:var(--red)}.bk{background:var(--amber)}.by{background:var(--green)}.ba{background:#30363d}.bu{flex:0 0 64px;background:#21262d;color:var(--dim)}
+.btns{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(transparent,var(--bg) 22%);padding:18px 12px 26px;display:flex;gap:8px}
+button{flex:1;border:0;border-radius:12px;padding:16px 4px;font-size:15px;font-weight:700;color:#fff;background:#2d333b}
+/* 판정 3종은 넓게, 보조(초록·취소)는 좁게 — 오조작 시 비용이 큰 쪽에 면적을 준다 */
+.by,.bn,.bk{flex:1.25}
+.bn{background:var(--red)}.bk{background:var(--amber)}.by{background:var(--green)}
+.ba{flex:0 0 58px;background:#30363d;font-size:13px}.bu{flex:0 0 50px;background:#21262d;color:var(--dim)}
 .phase{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
 .done{margin-top:40px;text-align:center;color:var(--dim)}
 a{color:var(--blue);text-decoration:none;font-size:13px}
@@ -161,10 +164,11 @@ a{color:var(--blue);text-decoration:none;font-size:13px}
 <div class="days" id="days"></div>
 <div class="bar"><i id="fill" style="width:0%"></i></div>
 <div class="meta"><span id="phase" class="phase"></span><span id="prog"></span></div>
+<div id="last" class="meta" style="margin-top:6px;font-size:12px"></div>
 <div id="main"></div>
 <div class="btns" id="btns"></div>
 <script>
-let DATE=null, CUR=null, ABS=false;
+let DATE=null, CUR=null, ABS=false, LAST=null;
 const $=id=>document.getElementById(id);
 async function j(url,opt){const r=await fetch(url,opt);return r.json()}
 async function loadDays(){
@@ -187,6 +191,9 @@ async function next(){
   }
   CUR=r.item;
   $('phase').textContent=r.phase==='triage'?'1패스 — 제목만 보고':'2패스 — 초록 읽고 판정';
+  if(LAST){const t={true:'관련',false:'무관',null:'보류'}[LAST.rel];
+    const c={true:'var(--green)',false:'var(--red)',null:'var(--amber)'}[LAST.rel];
+    $('last').innerHTML=`직전: <b style="color:${c}">${t}</b> · ${esc(LAST.label.slice(0,40))}`;}
   $('main').innerHTML=`<div class="card">
     <h2>${esc(CUR.title)}</h2>
     ${CUR.title_ko?`<div class="ko">${esc(CUR.title_ko)}</div>`:''}
@@ -198,13 +205,17 @@ async function next(){
     </div>
     <input class="note" id="note" placeholder="메모 (경계 사례일 때만)">
   </div>`;
+  // ★ 버튼 순서는 [관련][무관][보류] 로 **모든 화면에서 고정**합니다.
+  // 이전 버전은 1패스가 [무관][보류][초록] 이었다가 초록을 펼치면
+  // [관련][무관][보류] 로 바뀌어, 같은 자리를 연타하면 무관이 관련로 뒤집혔습니다.
+  // 파괴적인 버튼이 자리를 옮기면 안 됩니다.
   if(r.phase==='review'){showAbs();render(['y','n','u'])}
-  else{render(['n','k','a','u'])}
+  else{render(['y','n','k','a','u'])}
 }
 function showAbs(){ABS=true;$('abs').classList.add('show');$('note').classList.add('show')}
 function render(keys){
   const map={n:['무관','bn',()=>send(false)],k:['보류','bk',()=>send(null)],
-    a:['초록','ba',()=>{showAbs();render(['y','n','k','u'])}],
+    a:['초록','ba',()=>{showAbs();render(['y','n','k','u'])}],  // 순서 동일
     y:['관련','by',()=>send(true)],u:['↩','bu',undo]};
   $('btns').innerHTML='';
   keys.forEach(k=>{const[t,c,f]=map[k];const b=document.createElement('button');
@@ -212,8 +223,10 @@ function render(keys){
 }
 async function send(rel){
   const basis=ABS?'abstract':'title';
+  const label=CUR.title_ko||CUR.title;
   await j('/api/label',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({date:DATE,item_id:CUR.id,relevant:rel,basis:basis,note:($('note')||{}).value||''})});
+  LAST={rel:rel,label:label};
   next();
 }
 async function undo(){await j('/api/undo',{method:'POST'});next()}
