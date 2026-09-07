@@ -17,6 +17,15 @@ data/cache/
 data/.arxiv_lock
 .env
 .env.*
+# ★ 자격증명 파일 — AWS 콘솔이 내려주는 CSV 형태를 포함해 전부 차단합니다.
+#   이 저장소는 public 이라 한 번 커밋되면 되돌려도 이미 유출입니다
+#   (CLAUDE.md §3-2 · 사람인 약관 조항 5).
+*accessKeys*.csv
+*credentials*.csv
+*_accessKeys.csv
+credentials
+*.pem
+*.p12
 # Python
 __pycache__/
 *.py[cod]
@@ -33,3 +42,9 @@ site/public/
 site/resources/
 # macOS
 .DS_Store
+
+# S3 동기화 (src/storage/sync.py)
+# 매니페스트는 이 머신의 업로드 이력. 커밋하면 다른 머신이 남의 이력을 믿고 건너뜁니다.
+data/s3_manifest.json
+# RADAR_MODE=fake 로 돌렸을 때의 로컬 스토어. 실제 S3가 아닙니다.
+data/_fake_s3/
