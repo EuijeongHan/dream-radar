@@ -1,0 +1,11 @@
+# S3 동기화 전용. **Actions에는 설치하지 않습니다.**
+#
+# botocore가 100MB에 가까워서, 수집만 하는 daily-papers 크론이 매일 이걸 받을 이유가
+# 없습니다. requirements-eval.txt(약 1GB)를 Actions에서 제외한 것과 같은 판단입니다.
+#
+#   pip install -r requirements-s3.txt
+#
+# 자격증명은 여기 없습니다. boto3 기본 체인(환경변수 · ~/.aws · 인스턴스 역할)을 씁니다.
+# CLAUDE.md §3-2 — 이 저장소는 public 입니다.
+
+boto3==1.43.89

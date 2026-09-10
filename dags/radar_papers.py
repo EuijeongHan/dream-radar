@@ -63,6 +63,11 @@ RUN_STAGE = (
     "python -m src.core.pipeline --channel {channel} --stage {stage}"
 )
 
+#: 수집분을 오브젝트 스토리지로 증분 적재한다 (`src/storage/sync.py`).
+#: 스테이지가 아니라 별도 태스크인 이유: 원장(`ledger.STAGES`)은 확정 스키마이고
+#: (작업규약 §3-T7), 적재는 파이프라인 산출물이 아니라 그 **보존** 이기 때문이다.
+SYNC_S3 = "cd {home} && python -m src.storage.sync --channel {channel}"
+
 with DAG(
     dag_id="radar_papers",
     description="arXiv 논문 수집·랭킹·요약·발행 (CLAUDE.md §3-6 준수: 직렬 실행)",
@@ -84,6 +89,7 @@ with DAG(
 ) as dag:
 
     previous = None
+    collect_task = None
 
     for stage in STAGES:
         if stage in IMPLEMENTED_STAGES:
@@ -107,6 +113,31 @@ with DAG(
                 ),
             )
 
+        if stage == "collect":
+            collect_task = task
+
         if previous is not None:
             previous >> task
         previous = task
+
+    # ── 수집 직후 적재 ────────────────────────────────────────────────────
+    # collect 뒤에 두는 이유: 랭킹·요약이 실패해도 **수집분은 이미 보존**된다.
+    # 파이프라인 끝에 두면 요약 단계가 죽는 날의 후보 파일이 이 머신에만 남는데,
+    # `data/candidates/` 는 gitignore라 머신이 죽으면 같이 사라진다. arXiv 창은
+    # 48시간이라 과거분은 재수집으로 복구되지 않는다.
+    sync_task = BashOperator(
+        task_id="sync_s3",
+        bash_command=SYNC_S3.format(home=RADAR_HOME, channel=CHANNEL),
+        doc_md=(
+            "`python -m src.storage.sync --channel papers`\n\n"
+            "`data/candidates/*.jsonl` 를 `s3://$RADAR_S3_BUCKET/"
+            "{prefix}/channel=papers/dt=YYYY-MM-DD/` 로 증분 적재한다.\n\n"
+            "- 해시가 같으면 건너뛴다 (증분)\n"
+            "- 매니페스트를 잃으면 원격 head 로 복구한다 (전량 재업로드 방지)\n"
+            "- 업로드 직전 줄 단위로 `assert_public_scope()` 를 태운다 (CLAUDE.md §3-3)\n\n"
+            "**환경변수**: `RADAR_S3_BUCKET` 필수, `RADAR_S3_PREFIX` 선택(기본 `radar`).\n"
+            "미설정이면 조용히 건너뛰지 않고 **exit 1** 이다."
+        ),
+    )
+    if collect_task is not None:
+        collect_task >> sync_task
