@@ -1,0 +1,98 @@
+<meta charset="UTF-8">
+<style>html,body{margin:0;padding:0;background:#15181f}svg{display:block}</style>
+
+<svg width="1400" height="760" viewBox="0 0 1400 760" xmlns="http://www.w3.org/2000/svg"
+     font-family="'Noto Sans CJK KR','Apple SD Gothic Neo',sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6d7684"/>
+    </marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ff7b72"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="760" fill="#15181f"/>
+
+  <!-- ── row 1 ── -->
+  <g>
+    <rect x="40"  y="40" width="380" height="150" rx="4" fill="#1e232d" stroke="#333a48"/>
+    <rect x="40"  y="40" width="380" height="5" fill="#4dd0a0"/>
+    <text x="70"  y="80"  fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2">01</text>
+    <text x="70"  y="120" fill="#eef1f6" font-size="31" font-weight="900">데이터 수집</text>
+    <text x="70"  y="155" fill="#9aa4b4" font-size="22">forG — DART 정형 API 폴링</text>
+    <text x="70" y="182" fill="#6d7684" font-size="21">Radar — arXiv API · S3 증분 적재</text>
+
+    <rect x="510" y="40" width="380" height="150" rx="4" fill="#1e232d" stroke="#333a48"/>
+    <rect x="510" y="40" width="380" height="5" fill="#4dd0a0"/>
+    <text x="540" y="80"  fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2">02</text>
+    <text x="540" y="120" fill="#eef1f6" font-size="31" font-weight="900">오케스트레이션</text>
+    <text x="540" y="155" fill="#9aa4b4" font-size="22">Airflow DAG · 일 1회 수집 스케줄</text>
+
+    <rect x="980" y="40" width="380" height="150" rx="4" fill="#1e232d" stroke="#333a48"/>
+    <rect x="980" y="40" width="380" height="5" fill="#4dd0a0"/>
+    <text x="1010" y="80"  fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2">03</text>
+    <text x="1010" y="120" fill="#eef1f6" font-size="31" font-weight="900">전처리</text>
+    <text x="1010" y="155" fill="#9aa4b4" font-size="22">Stratified Split · 청크 재설계</text>
+    <text x="1010" y="182" fill="#6d7684" font-size="21">BM25 + dense 하이브리드 인덱스</text>
+
+    <line x1="424" y1="115" x2="502" y2="115" stroke="#6d7684" stroke-width="2.5" marker-end="url(#a)"/>
+    <line x1="894" y1="115" x2="972" y2="115" stroke="#6d7684" stroke-width="2.5" marker-end="url(#a)"/>
+  </g>
+  <line x1="1170" y1="194" x2="1170" y2="246" stroke="#6d7684" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <!-- ── row 2 (오른쪽 → 왼쪽) ── -->
+  <g>
+    <rect x="980" y="254" width="380" height="150" rx="4" fill="#1e232d" stroke="#333a48"/>
+    <rect x="980" y="254" width="380" height="5" fill="#4dd0a0"/>
+    <text x="1010" y="294" fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2">04</text>
+    <text x="1010" y="334" fill="#eef1f6" font-size="31" font-weight="900">학습</text>
+    <text x="1010" y="369" fill="#9aa4b4" font-size="22">YOLO 앙상블 · Optuna</text>
+    <text x="1010" y="396" fill="#6d7684" font-size="21">Phi-4-mini LoRA SFT</text>
+
+    <rect x="510" y="254" width="380" height="150" rx="4" fill="#1e232d" stroke="#333a48"/>
+    <rect x="510" y="254" width="380" height="5" fill="#4dd0a0"/>
+    <text x="540" y="294" fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2">05</text>
+    <text x="540" y="334" fill="#eef1f6" font-size="31" font-weight="900">모델 레지스트리</text>
+    <text x="540" y="369" fill="#9aa4b4" font-size="22">MLflow — v1 @champion</text>
+
+    <rect x="40"  y="254" width="380" height="150" rx="4" fill="#1e232d" stroke="#333a48"/>
+    <rect x="40"  y="254" width="380" height="5" fill="#4dd0a0"/>
+    <text x="70"  y="294" fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2">06</text>
+    <text x="70"  y="334" fill="#eef1f6" font-size="31" font-weight="900">배포 게이트</text>
+    <text x="70"  y="369" fill="#9aa4b4" font-size="22">PASS / GOOD / FAIL 자동</text>
+
+    <line x1="972" y1="329" x2="894" y2="329" stroke="#6d7684" stroke-width="2.5" marker-end="url(#a)"/>
+    <line x1="502" y1="329" x2="424" y2="329" stroke="#6d7684" stroke-width="2.5" marker-end="url(#a)"/>
+  </g>
+  <line x1="230" y1="408" x2="230" y2="460" stroke="#6d7684" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <!-- ── row 3 ── -->
+  <g>
+    <rect x="40"  y="468" width="380" height="150" rx="4" fill="#1e232d" stroke="#333a48"/>
+    <rect x="40"  y="468" width="380" height="5" fill="#4dd0a0"/>
+    <text x="70"  y="508" fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2">07</text>
+    <text x="70"  y="548" fill="#eef1f6" font-size="31" font-weight="900">서빙 · 추론</text>
+    <text x="70"  y="583" fill="#9aa4b4" font-size="22">vLLM · FastAPI · LangGraph</text>
+    <text x="70" y="610" fill="#6d7684" font-size="21">Tool Calling 에이전트 · 재생성 루프</text>
+
+    <rect x="510" y="468" width="380" height="150" rx="4" fill="#1e232d" stroke="#333a48"/>
+    <rect x="510" y="468" width="380" height="5" fill="#4dd0a0"/>
+    <text x="540" y="508" fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2">08</text>
+    <text x="540" y="548" fill="#eef1f6" font-size="31" font-weight="900">관측 · 평가</text>
+    <text x="540" y="583" fill="#9aa4b4" font-size="22">Langfuse · DINOv2 자동 채점</text>
+    <text x="540" y="610" fill="#6d7684" font-size="21">LLM-as-Judge · 릴리즈 게이트</text>
+
+    <rect x="980" y="468" width="380" height="150" rx="4" fill="#1e232d" stroke="#333a48"/>
+    <rect x="980" y="468" width="380" height="5" fill="#4dd0a0"/>
+    <text x="1010" y="508" fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2">09</text>
+    <text x="1010" y="548" fill="#eef1f6" font-size="31" font-weight="900">피드백 → 재학습</text>
+    <text x="1010" y="583" fill="#9aa4b4" font-size="22">수집 → 재학습 트리거</text>
+
+    <line x1="424" y1="543" x2="502" y2="543" stroke="#6d7684" stroke-width="2.5" marker-end="url(#a)"/>
+    <line x1="894" y1="543" x2="972" y2="543" stroke="#6d7684" stroke-width="2.5" marker-end="url(#a)"/>
+  </g>
+
+  <!-- ── 09 → 01 되돌림 (미완결) ── -->
+  <path d="M1170,622 L1170,706 L16,706 L16,115 L32,115"
+        fill="none" stroke="#6d7684" stroke-width="2.5" marker-end="url(#a)"/>
+  </svg>

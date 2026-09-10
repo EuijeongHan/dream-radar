@@ -1,0 +1,94 @@
+<meta charset="UTF-8">
+<style>html,body{margin:0;padding:0;background:#15181f}svg{display:block}</style>
+
+<svg width="1400" height="820" viewBox="0 0 1400 820" xmlns="http://www.w3.org/2000/svg"
+     font-family="'Noto Sans CJK KR','Apple SD Gothic Neo',sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9aa4b4"/>
+    </marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4dd0a0"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="820" fill="#15181f"/>
+
+  <!-- ══ CLIENT ══ -->
+  <rect x="470" y="30" width="460" height="132" rx="5" fill="#1e232d" stroke="#333a48" stroke-width="2"/>
+  <text x="500" y="62" fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2.5">CLIENT</text>
+  <!-- 터미널 아이콘 -->
+  <rect x="862" y="42" width="46" height="36" rx="3" fill="none" stroke="#6d7684" stroke-width="2"/>
+  <path d="M872,54 l8,6 -8,6 M886,66 h12" stroke="#6d7684" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <text x="500" y="102" fill="#eef1f6" font-size="26" font-weight="900" font-family="ui-monospace,monospace">register_model.py</text>
+  <text x="500" y="140" fill="#eef1f6" font-size="26" font-weight="900" font-family="ui-monospace,monospace">verify_parity.py</text>
+
+  <line x1="700" y1="166" x2="700" y2="246" stroke="#9aa4b4" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="718" y="200" fill="#ffa726" font-size="22" font-weight="700">REST API</text>
+  <text x="718" y="226" fill="#6d7684" font-size="19">저장소에 직접 접근하지 않음</text>
+
+  <!-- ══ TRACKING SERVER (점선 경계) ══ -->
+  <rect x="60" y="254" width="1280" height="140" rx="6" fill="none" stroke="#ffa726" stroke-width="2.5" stroke-dasharray="12 7"/>
+  <text x="92" y="290" fill="#ffa726" font-size="20" font-weight="800" letter-spacing="2.5">MLFLOW TRACKING SERVER</text>
+  <text x="92" y="332" fill="#eef1f6" font-size="27" font-weight="900" font-family="ui-monospace,monospace">mlflow server</text>
+  <text x="92" y="368" fill="#9aa4b4" font-size="21" font-family="ui-monospace,monospace">--host 127.0.0.1 --port 5001 --serve-artifacts</text>
+
+  <rect x="1010" y="290" width="300" height="76" rx="4" fill="#262c38" stroke="#333a48"/>
+  <text x="1035" y="322" fill="#eef1f6" font-size="22" font-weight="700">아티팩트 프록시</text>
+  <text x="1035" y="350" fill="#6d7684" font-size="19">클라이언트 대신 서버가 읽고 씀</text>
+
+  <!-- 분기 -->
+  <path d="M340,398 L340,440" stroke="#9aa4b4" stroke-width="2.5" marker-end="url(#a)" fill="none"/>
+  <text x="358" y="428" fill="#9aa4b4" font-size="21">메타데이터</text>
+  <path d="M1060,398 L1060,440" stroke="#9aa4b4" stroke-width="2.5" marker-end="url(#a)" fill="none"/>
+  <text x="1078" y="428" fill="#9aa4b4" font-size="21">대용량 파일</text>
+
+  <!-- ══ BACKEND STORE ══ -->
+  <rect x="60" y="448" width="600" height="330" rx="5" fill="#1e232d" stroke="#333a48" stroke-width="2"/>
+  <text x="92" y="484" fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2.5">BACKEND STORE</text>
+  <!-- DB 실린더 아이콘 -->
+  <g stroke="#4dd0a0" stroke-width="2.5" fill="none">
+    <ellipse cx="596" cy="474" rx="34" ry="11"/>
+    <path d="M562,474 v34 a34,11 0 0 0 68,0 v-34"/>
+    <path d="M562,491 a34,11 0 0 0 68,0"/>
+  </g>
+  <text x="92" y="524" fill="#eef1f6" font-size="28" font-weight="900" font-family="ui-monospace,monospace">sqlite:///mlflow.db</text>
+  <text x="92" y="562" fill="#9aa4b4" font-size="22">run · params 10 · metrics 2</text>
+
+  <!-- 중첩: Model Registry -->
+  <rect x="92" y="592" width="536" height="146" rx="5" fill="#1d3b31" stroke="#4dd0a0" stroke-width="2.5"/>
+  <text x="120" y="628" fill="#4dd0a0" font-size="20" font-weight="800" letter-spacing="2.5">MODEL REGISTRY</text>
+  <text x="120" y="672" fill="#eef1f6" font-size="30" font-weight="900" font-family="ui-monospace,monospace">v1 @champion</text>
+  <text x="120" y="712" fill="#9aa4b4" font-size="21">버전 · 별칭이 여기 산다 — 그래서 DB가 필요</text>
+
+  <!-- ══ ARTIFACT STORE ══ -->
+  <rect x="740" y="448" width="600" height="330" rx="5" fill="#1e232d" stroke="#333a48" stroke-width="2"/>
+  <text x="772" y="484" fill="#6d7684" font-size="20" font-weight="800" letter-spacing="2.5">ARTIFACT STORE</text>
+  <!-- 패키지 아이콘 -->
+  <g stroke="#4dd0a0" stroke-width="2.5" fill="none">
+    <path d="M1246,462 l34,-16 34,16 v38 l-34,16 -34,-16 z"/>
+    <path d="M1246,462 l34,16 34,-16 M1280,478 v38"/>
+  </g>
+  <text x="772" y="524" fill="#eef1f6" font-size="28" font-weight="900" font-family="ui-monospace,monospace">./mlartifacts</text>
+  <text x="772" y="562" fill="#9aa4b4" font-size="22">모델 1개 = 아티팩트 5종 + 로더</text>
+
+  <rect x="772" y="592" width="256" height="60" rx="4" fill="#262c38" stroke="#333a48"/>
+  <text x="794" y="618" fill="#eef1f6" font-size="21" font-weight="700">가중치 2종</text>
+  <text x="794" y="642" fill="#6d7684" font-size="19">63.25 MB</text>
+
+  <rect x="1052" y="592" width="256" height="60" rx="4" fill="#262c38" stroke="#333a48"/>
+  <text x="1074" y="618" fill="#eef1f6" font-size="21" font-weight="700">카테고리 매핑</text>
+  <text x="1074" y="642" fill="#6d7684" font-size="19">73개 클래스</text>
+
+  <rect x="772" y="666" width="256" height="60" rx="4" fill="#262c38" stroke="#333a48"/>
+  <text x="794" y="692" fill="#eef1f6" font-size="21" font-weight="700">meta.csv</text>
+  <text x="794" y="716" fill="#6d7684" font-size="19">표시명 · 성상</text>
+
+  <rect x="1052" y="666" width="256" height="60" rx="4" fill="#262c38" stroke="#333a48"/>
+  <text x="1074" y="692" fill="#eef1f6" font-size="21" font-weight="700">infer_config</text>
+  <text x="1074" y="716" fill="#6d7684" font-size="19">추론 상수 6종</text>
+
+  <!-- 로드 경로 -->
+  <path d="M660,665 L740,665" stroke="#4dd0a0" stroke-width="2.5" marker-end="url(#ag)" fill="none"/>
+  <text x="700" y="648" fill="#4dd0a0" font-size="19" font-weight="700" text-anchor="middle">함께</text>
+  <text x="700" y="628" fill="#4dd0a0" font-size="19" font-weight="700" text-anchor="middle">로드</text>
+</svg>
