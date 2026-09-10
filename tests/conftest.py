@@ -12,9 +12,24 @@
 
 from __future__ import annotations
 
+import pytest
+
+from eval import pool as _pool
+
 
 def pytest_configure(config) -> None:
     config.addinivalue_line(
         "markers",
         "slow: 실모델 가중치를 로드하는 테스트. 기본 실행에서 빼려면 network 마커를 함께 붙인다",
     )
+
+
+@pytest.fixture(autouse=True)
+def _isolate_label_pools(tmp_path_factory, monkeypatch):
+    """라벨링 풀 디렉터리를 테스트마다 빈 곳으로 돌립니다 (함정 9.1).
+
+    `eval/pools/<날짜>.json` 은 저장소에 커밋되는 실제 풀입니다. 격리하지 않으면 라벨링
+    도구 테스트가 **진짜 풀**을 읽고 — 테스트 날짜(2026-08-12)가 실제 날짜와 같아서 —
+    가짜 후보 30건이 실제 풀의 item_id 로 걸러져 0건이 됩니다.
+    """
+    monkeypatch.setattr(_pool, "POOLS_DIR", tmp_path_factory.mktemp("pools"))

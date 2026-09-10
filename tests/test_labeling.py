@@ -208,7 +208,8 @@ def test_export_shape_matches_spec(workspace, monkeypatch):
     doc = yaml.safe_load(out.read_text(encoding="utf-8"))
 
     assert doc["version"] == 1
-    assert doc["criteria_doc"] == "docs/라벨링_기준.md"
+    # 최고 번호 문서를 가리키는지는 test_pool.test_export_points_to_latest_criteria_doc 가 봅니다
+    assert doc["criteria_doc"].startswith("docs/라벨링_기준")
     assert doc["summary"]["total"] == 4
     assert doc["summary"]["relevant"] == 1
     for row in doc["labels"]:

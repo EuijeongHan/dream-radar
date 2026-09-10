@@ -14,6 +14,9 @@
     2패스(review)는 트리아지가 끝나면 자동으로 이어집니다. 초록이 항상 펼쳐지고
     메모 입력이 생깁니다.
 
+라벨링 풀(`python -m eval.pool`)이 있는 날은 **풀 안의 항목만** 보여줍니다
+(`L.work_items` — 터미널 도구와 같은 함수). 날짜 버튼에 `· 풀` 이 붙습니다.
+
 보안: 인증이 없는 LAN 전용 서버입니다. 집 와이파이에서만 쓰세요. 노출되는 건
 논문 제목·초록(공개 데이터)이고 받는 건 라벨뿐이며, 원장은 append-only라
 무엇이 언제 기록됐는지 항상 추적됩니다.
@@ -38,7 +41,7 @@ def api_status() -> dict[str, Any]:
     decided = L.latest_by_item(L.load_journal())
     days = []
     for date in L.available_dates():
-        items = L.load_candidates(date)
+        items = L.work_items(date)
         rows = [decided.get(i["id"]) for i in items]
         settled = sum(1 for r in rows if r and r["relevant"] is not None)
         pending = sum(1 for r in rows if r and r["relevant"] is None)
@@ -49,6 +52,9 @@ def api_status() -> dict[str, Any]:
                 "settled": settled,
                 "pending": pending,
                 "relevant": sum(1 for r in rows if r and r["relevant"] is True),
+                # 풀이 있으면 total 은 풀 크기입니다. 후보 전체 수는 따로 둡니다.
+                "candidates": len(L.load_candidates(date)),
+                "pooled": L.pool_member_ids(date) is not None,
             }
         )
     return {"days": days}
@@ -56,7 +62,7 @@ def api_status() -> dict[str, Any]:
 
 def api_next(date: str) -> dict[str, Any]:
     """다음 라벨링 대상 1건. 트리아지가 남았으면 트리아지, 아니면 2패스(보류분)."""
-    items = L.load_candidates(date)
+    items = L.work_items(date)
     translations = L.load_translations(date)
     decided = L.latest_by_item(L.load_journal())
 
@@ -173,7 +179,7 @@ const $=id=>document.getElementById(id);
 async function j(url,opt){const r=await fetch(url,opt);return r.json()}
 async function loadDays(){
   const s=await j('/api/status');
-  $('days').innerHTML=s.days.map(d=>`<button class="${d.date===DATE?'on':''}" onclick="pick('${d.date}')">${d.date.slice(5)}<br><small>${d.settled}/${d.total}</small></button>`).join('');
+  $('days').innerHTML=s.days.map(d=>`<button class="${d.date===DATE?'on':''}" onclick="pick('${d.date}')">${d.date.slice(5)}<br><small>${d.settled}/${d.total}${d.pooled?' · 풀':''}</small></button>`).join('');
   if(!DATE&&s.days.length){DATE=s.days[0].date}
 }
 function pick(d){DATE=d;next()}

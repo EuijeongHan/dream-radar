@@ -1,0 +1,453 @@
+{
+ "version": 1,
+ "date": "2026-08-18",
+ "candidates": 1132,
+ "depth": 30,
+ "random_n": 50,
+ "seed": "radar-pool:2026-08-18",
+ "conditions": [
+  "baseline",
+  "bge_m3",
+  "bge_m3_ko",
+  "bge_m3_rerank"
+ ],
+ "builds": [
+  {
+   "at": "2026-09-10T14:46:05+00:00",
+   "conditions": [
+    "baseline",
+    "bge_m3",
+    "bge_m3_ko",
+    "bge_m3_rerank"
+   ],
+   "depth": 30,
+   "profile": "data/profile.papers_2.yaml",
+   "ko_profile": "data/profile.papers.ko_1.yaml",
+   "embedder": "bge_m3@5617a9f6",
+   "reranker": "bge_reranker_v2_m3@953dc6f6",
+   "device": "mps"
+  }
+ ],
+ "members": {
+  "arxiv:2608.13546": [
+   "baseline"
+  ],
+  "arxiv:2608.13652": [
+   "random"
+  ],
+  "arxiv:2608.13668": [
+   "random"
+  ],
+  "arxiv:2608.13695": [
+   "baseline"
+  ],
+  "arxiv:2608.13702": [
+   "random"
+  ],
+  "arxiv:2608.13724": [
+   "random"
+  ],
+  "arxiv:2608.13835": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.13840": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.13865": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.13883": [
+   "baseline"
+  ],
+  "arxiv:2608.13926": [
+   "baseline"
+  ],
+  "arxiv:2608.13951": [
+   "random"
+  ],
+  "arxiv:2608.13956": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.13990": [
+   "random"
+  ],
+  "arxiv:2608.14016": [
+   "baseline"
+  ],
+  "arxiv:2608.14066": [
+   "random"
+  ],
+  "arxiv:2608.14070": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14106": [
+   "random"
+  ],
+  "arxiv:2608.14121": [
+   "random"
+  ],
+  "arxiv:2608.14172": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14210": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14226": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14282": [
+   "random"
+  ],
+  "arxiv:2608.14320": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.14321": [
+   "random"
+  ],
+  "arxiv:2608.14375": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14379": [
+   "random"
+  ],
+  "arxiv:2608.14457": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14505": [
+   "random"
+  ],
+  "arxiv:2608.14509": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.14522": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.14764": [
+   "random"
+  ],
+  "arxiv:2608.14765": [
+   "random"
+  ],
+  "arxiv:2608.14767": [
+   "random"
+  ],
+  "arxiv:2608.14783": [
+   "baseline"
+  ],
+  "arxiv:2608.14790": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14792": [
+   "baseline"
+  ],
+  "arxiv:2608.14804": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.14825": [
+   "random"
+  ],
+  "arxiv:2608.14838": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14841": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.14847": [
+   "random"
+  ],
+  "arxiv:2608.14876": [
+   "random"
+  ],
+  "arxiv:2608.14881": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.14886": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14896": [
+   "baseline",
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.14929": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.15041": [
+   "random"
+  ],
+  "arxiv:2608.15056": [
+   "baseline"
+  ],
+  "arxiv:2608.15104": [
+   "random"
+  ],
+  "arxiv:2608.15117": [
+   "random"
+  ],
+  "arxiv:2608.15129": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.15138": [
+   "random"
+  ],
+  "arxiv:2608.15238": [
+   "baseline"
+  ],
+  "arxiv:2608.15270": [
+   "random"
+  ],
+  "arxiv:2608.15338": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.15353": [
+   "baseline"
+  ],
+  "arxiv:2608.15360": [
+   "baseline"
+  ],
+  "arxiv:2608.15417": [
+   "random"
+  ],
+  "arxiv:2608.15432": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.15459": [
+   "baseline"
+  ],
+  "arxiv:2608.15471": [
+   "random"
+  ],
+  "arxiv:2608.15516": [
+   "random"
+  ],
+  "arxiv:2608.15535": [
+   "baseline"
+  ],
+  "arxiv:2608.15539": [
+   "baseline"
+  ],
+  "arxiv:2608.15574": [
+   "baseline"
+  ],
+  "arxiv:2608.15580": [
+   "baseline"
+  ],
+  "arxiv:2608.15583": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.15619": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.15630": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.15641": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.15685": [
+   "random"
+  ],
+  "arxiv:2608.15687": [
+   "random"
+  ],
+  "arxiv:2608.15691": [
+   "random"
+  ],
+  "arxiv:2608.15694": [
+   "random"
+  ],
+  "arxiv:2608.15760": [
+   "random"
+  ],
+  "arxiv:2608.15788": [
+   "random"
+  ],
+  "arxiv:2608.15804": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.15828": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.15851": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.15919": [
+   "baseline"
+  ],
+  "arxiv:2608.15980": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.16004": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.16010": [
+   "random"
+  ],
+  "arxiv:2608.16014": [
+   "random"
+  ],
+  "arxiv:2608.16018": [
+   "random"
+  ],
+  "arxiv:2608.16096": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.16100": [
+   "random"
+  ],
+  "arxiv:2608.16134": [
+   "random"
+  ],
+  "arxiv:2608.16161": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.16177": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.16207": [
+   "random"
+  ],
+  "arxiv:2608.16234": [
+   "random"
+  ],
+  "arxiv:2608.16249": [
+   "random"
+  ],
+  "arxiv:2608.16284": [
+   "baseline"
+  ],
+  "arxiv:2608.16286": [
+   "baseline",
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.16316": [
+   "random"
+  ],
+  "arxiv:2608.16323": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.16328": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.16347": [
+   "baseline"
+  ],
+  "arxiv:2608.16353": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.16367": [
+   "random"
+  ],
+  "arxiv:2608.16377": [
+   "random"
+  ],
+  "arxiv:2608.16391": [
+   "baseline"
+  ],
+  "arxiv:2608.16419": [
+   "random"
+  ],
+  "arxiv:2608.16467": [
+   "random"
+  ],
+  "arxiv:2608.16469": [
+   "random"
+  ],
+  "arxiv:2608.16508": [
+   "baseline"
+  ],
+  "arxiv:2608.16515": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.16535": [
+   "random"
+  ],
+  "arxiv:2608.16586": [
+   "baseline",
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.16627": [
+   "baseline",
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.16628": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.16643": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2608.16690": [
+   "baseline"
+  ],
+  "arxiv:2608.16745": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.16775": [
+   "baseline"
+  ],
+  "arxiv:2608.16793": [
+   "baseline"
+  ],
+  "arxiv:2608.16795": [
+   "random"
+  ],
+  "arxiv:2608.16805": [
+   "baseline"
+  ],
+  "arxiv:2608.16806": [
+   "baseline"
+  ],
+  "arxiv:2608.16812": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.16831": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2608.16834": [
+   "random"
+  ],
+  "arxiv:2608.16887": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ]
+ }
+}

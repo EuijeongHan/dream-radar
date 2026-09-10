@@ -13,9 +13,15 @@
   (§5.3 임베딩 캐시도 `src.rank.embed.CachedEmbedder` 안에 있습니다).
 - **원장(`data/runs.jsonl`)에 쓰지 않습니다.** 원장 1줄 = 파이프라인 1회 실행(§4.4)이고
   평가는 로컬 1회성 배치입니다. 평가의 기록물은 `eval/results.md` 입니다.
-- **골드셋을 만들지 않습니다.** 랭커로 후보를 뽑아 라벨링하면 평가 대상이 정답셋의
-  범위를 정하게 됩니다 (§9.11 풀링 편향). 골드셋은 `eval/label.py` 전수 라벨링의
-  산출물이고, 없으면 이 러너는 **거부합니다.**
+- **골드셋을 만들지 않습니다.** 골드셋은 `eval/label.py` 라벨링의 산출물이고, 없으면
+  이 러너는 **거부합니다.** 무엇을 라벨링할지는 `eval/pool.py` 가 정합니다 — 비교할
+  조건 **전부**의 상위 30 합집합 + 풀 밖 무작위 50 (다중 시스템 풀링,
+  docs/05_골드셋_풀링.md). 랭커 **하나의** 상위 N 만 라벨링하면 평가 대상이 정답셋의
+  범위를 정하게 되지만(§9.11), 풀링은 모든 조건이 같은 깊이로 기여합니다. 풀에 기여하지
+  않은 조건은 results.md 판정률(judged@10) 표에 ⚠ 로 드러납니다.
+- **랭킹 계산(`compute_rankings`)은 라벨링 풀과 공유합니다.** 둘이 따로 구현되면 풀을
+  만든 랭킹과 평가한 랭킹이 갈라져 "기여한 조건의 상위 10 은 전부 판정됨" 이 조용히
+  깨집니다.
 
 여기서 직접 구현하는 것은 두 가지뿐입니다
 ------------------------------------------
@@ -39,7 +45,7 @@ import argparse
 import math
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -156,6 +162,10 @@ class DateResult:
     #: 골드셋에 정답으로 라벨됐는데 그날 후보 풀에 없는 건수. 랭커의 잘못이 아니라
     #: 수집·중복제거 쪽 문제이므로 지표와 분리해 따로 기록합니다.
     gold_missing: int
+    #: 상위 10 중 골드셋에 판정(관련·무관)이 있는 비율. 풀링 골드셋에서 풀에 기여하지
+    #: 않은 조건은 1.0 미만이 되고, 미판정은 무관으로 세어져 그 조건이 **불리하게**
+    #: 측정됩니다. 판정 정보가 없으면 None — 0.0 과 다릅니다.
+    judged_at_10: float | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -181,8 +191,14 @@ def evaluate_condition(
     rankings: Mapping[str, Sequence[str]],
     gold: Mapping[str, Iterable[str]],
     candidate_counts: Mapping[str, int],
+    *,
+    judged: Mapping[str, Iterable[str]] | None = None,
 ) -> ConditionResult:
-    """날짜별로 지표를 계산하고 (평균은 `ConditionResult.mean`) 제외된 날을 보고합니다."""
+    """날짜별로 지표를 계산하고 (평균은 `ConditionResult.mean`) 제외된 날을 보고합니다.
+
+    `judged` 는 `{날짜: 판정된 item_id}` 입니다. 주면 날짜별 판정률(judged@10)을 함께
+    남깁니다 — 풀링 골드셋에서 풀에 기여하지 않은 조건을 드러내는 값입니다.
+    """
     rows: list[DateResult] = []
     excluded: list[str] = []
     for date in sorted(rankings):
@@ -205,9 +221,21 @@ def evaluate_condition(
                 mrr=reciprocal,
                 ndcg_at_10=gain,
                 gold_missing=len(gold_ids - set(ranked)),
+                judged_at_10=_judged_at(ranked, None if judged is None else judged.get(date, ())),
             )
         )
     return ConditionResult(condition=condition, per_date=tuple(rows), excluded_dates=tuple(excluded))
+
+
+def _judged_at(ranked: Sequence[str], judged_ids: Iterable[str] | None, k: int = 10) -> float | None:
+    """상위 k(= nDCG 깊이) 중 판정이 있는 비율. 판정 정보가 없으면 None."""
+    if judged_ids is None:
+        return None
+    top = list(ranked[:k])
+    if not top:
+        return None
+    judged_set = set(judged_ids)
+    return sum(1 for item_id in top if item_id in judged_set) / len(top)
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -294,10 +322,12 @@ def baseline_scores(
 # ══════════════════════════════════════════════════════════════════════════
 
 _LABELING_GUIDE = """골드셋이 없으면 평가할 수 없습니다 (기획안_2 §5.8 DoD).
-랭커 상위 N건만 라벨링해서 대신하지 마세요 — 평가 대상이 정답셋의 범위를 정하게 되어
-개선폭이 실제보다 좋게 나옵니다 (§9.11 풀링 편향).
+랭커 **하나의** 상위 N건만 라벨링해서 대신하지 마세요 — 평가 대상이 정답셋의 범위를
+정하게 되어 개선폭이 실제보다 좋게 나옵니다 (§9.11 풀링 편향). 풀은 비교할 조건
+**전부**로 만듭니다 (docs/05_골드셋_풀링.md).
 
-  python -m eval.label triage  --date <날짜>   # 1패스 — 제목만 보고 전수 트리아지
+  python -m eval.pool                          # 0 — 라벨링 풀 (4조건 상위 30 + 무작위 50)
+  python -m eval.label triage  --date <날짜>   # 1패스 — 제목만 보고 트리아지 (풀 안만)
   python -m eval.label review  --date <날짜>   # 2패스 — 보류분 초록 판정
   python -m eval.label recheck --date <날짜>   # 1패스 누락률 실측
   python -m eval.label status                  # 진행률 (3일치 필요)
@@ -316,6 +346,10 @@ class Goldset:
     #: 1패스 누락률. `recheck` 를 안 돌렸으면 `None` 입니다 — **안 한 것은 안 했다고**
     #: 적습니다 (작업규약 §7.2). 0.0 으로 채우면 "재검토했는데 누락이 없었다"가 됩니다.
     miss_rate: float | None
+    #: 날짜별로 **판정된** item_id (관련·무관 모두). judged@10 을 계산합니다.
+    judged: Mapping[str, frozenset[str]] = field(default_factory=dict)
+    #: export 가 남긴 날짜별 풀 요약 (`summary.pooling`). 풀 없이 라벨링했으면 None.
+    pooling: Mapping[str, Any] | None = None
 
 
 def load_goldset(path: Path | None = None) -> Goldset:
@@ -329,6 +363,7 @@ def load_goldset(path: Path | None = None) -> Goldset:
 
     gold: dict[str, set[str]] = {}
     labeled: dict[str, int] = {}
+    judged: dict[str, set[str]] = {}
     for row in document["labels"]:
         date = str(row["date"])
         if row.get("relevant") is None:
@@ -336,6 +371,7 @@ def load_goldset(path: Path | None = None) -> Goldset:
             # 접으면 정답 수가 조용히 줄어 Hit@5 의 상한이 내려갑니다.
             raise SystemExit(f"{path}: 보류(relevant: null) 라벨이 남아 있습니다 — {row['item_id']}")
         labeled[date] = labeled.get(date, 0) + 1
+        judged.setdefault(date, set()).add(str(row["item_id"]))
         if row["relevant"]:
             gold.setdefault(date, set()).add(str(row["item_id"]))
 
@@ -351,6 +387,8 @@ def load_goldset(path: Path | None = None) -> Goldset:
         recheck_sampled=int(recheck.get("sampled", 0) or 0),
         recheck_flipped=int(recheck.get("flipped_to_relevant", 0) or 0),
         miss_rate=recheck.get("miss_rate"),
+        judged={date: frozenset(judged.get(date, ())) for date in dates},
+        pooling=summary.get("pooling") or None,
     )
 
 
@@ -391,43 +429,61 @@ def embedding_ranking(
     return head_ids + [row.item_id for row in ranked if row.item_id not in seen]
 
 
-def run_conditions(
-    conditions: Sequence[str] | None = None,
+def _validate_conditions(conditions: Sequence[str]) -> tuple[str, ...]:
+    selected = tuple(conditions)
+    unknown = [name for name in selected if name not in CONDITIONS]
+    if unknown:
+        raise SystemExit(f"알 수 없는 조건: {unknown}. 가능한 값: {sorted(CONDITIONS)}")
+    return selected
+
+
+@dataclass(slots=True)
+class RankingRun:
+    """`compute_rankings` 의 결과 — 랭킹과, 그 랭킹을 만든 모델·프로파일.
+
+    평가(`run_conditions`)와 라벨링 풀(`eval.pool`)이 **같은 함수**에서 이걸 받습니다.
+    """
+
+    #: `{조건: {날짜: 전체 랭킹(item_id 리스트)}}` — 꼬리를 자르지 않은 전체 순위입니다.
+    rankings: dict[str, dict[str, list[str]]]
+    device: str
+    models: Mapping[str, Any]
+    profile: Mapping[str, Any]
+    profile_path: Path
+    ko_path: Path | None
+    settings: Any
+    embedder: Embedder | None
+    reranker: Reranker | None
+    querysets: dict[str, Any]
+
+
+def compute_rankings(
+    conditions: Sequence[str],
+    items_by_date: Mapping[str, Sequence[Any]],
     *,
     device: str | None = None,
-    goldset_path: Path | None = None,
-    candidates_dir: Path | None = None,
     models_path: Path | None = None,
     profile_root: Path | None = None,
     cache_dir: Path | None = None,
-    out: Path | None = None,
     embedder: Embedder | None = None,
     reranker: Reranker | None = None,
     embedder_kind: str | None = None,
     reranker_kind: str | None = None,
     penalty_weight: float | None = None,
-) -> Path:
-    """골드셋의 모든 날짜에 대해 조건들을 돌리고 `eval/results.md` 를 씁니다.
+) -> RankingRun:
+    """조건별·날짜별 전체 랭킹을 만듭니다. 골드셋은 읽지 않습니다.
 
-    경로·설정 인자의 기본값은 전부 `None` 이고 **호출 시점에** 해석합니다 (§9.1 / R7).
+    평가와 라벨링 풀(`python -m eval.pool`)이 **이 함수 하나**를 씁니다. 풀을 만든
+    랭킹과 평가한 랭킹이 다른 코드에서 나오면 "풀에 기여한 조건의 상위 10 은 전부
+    판정됨" 이라는 보장이 조용히 깨집니다 (docs/05_골드셋_풀링.md).
 
     `embedder`/`reranker` 를 직접 넘기면 생성을 건너뜁니다 — 테스트가 스텁을 주입하는
     통로입니다. **기본값은 스텁이 아니라 실모델입니다**: `hash_stub` 으로 낸 Hit@5 는
     거짓이고(작업규약 §8-9), 모델이 없어서 죽는 게 가짜로 성공하는 것보다 낫습니다(§4.2).
     """
-    selected = tuple(conditions or DEFAULT_CONDITIONS)
-    unknown = [name for name in selected if name not in CONDITIONS]
-    if unknown:
-        raise SystemExit(f"알 수 없는 조건: {unknown}. 가능한 값: {sorted(CONDITIONS)}")
-
-    goldset = load_goldset(goldset_path)
+    selected = _validate_conditions(conditions)
     models = load_models_config(models_path)
     resolved_device = device or str((models.get("device") or {}).get("preferred", "cpu"))
-
-    items_by_date: dict[str, list[Any]] = {
-        date: list(load_candidates(date, candidates_dir)) for date in goldset.dates
-    }
-    candidate_counts = {date: len(items) for date, items in items_by_date.items()}
 
     profile, profile_path = _load(PROFILE_STEM, profile_root)
     settings = stage1_settings(profile)
@@ -458,18 +514,18 @@ def run_conditions(
                 embedder, profile=ko_profile, profile_path=ko_path, penalty_weight=penalty_weight
             )
 
-    results: list[ConditionResult] = []
+    rankings: dict[str, dict[str, list[str]]] = {}
     for name in selected:
         if name == "baseline":
             interests = profile.get("interests") or ()
             if not interests:
                 raise SystemExit(f"{profile_path} 에 interests 가 없습니다")
-            rankings = {
+            rankings[name] = {
                 date: rank_items(baseline_scores(items, interests))
                 for date, items in items_by_date.items()
             }
         else:
-            rankings = {
+            rankings[name] = {
                 date: embedding_ranking(
                     items,
                     embedder,  # type: ignore[arg-type]  — 위에서 None 을 배제했습니다
@@ -481,28 +537,97 @@ def run_conditions(
                 )
                 for date, items in items_by_date.items()
             }
-        results.append(evaluate_condition(name, rankings, goldset.gold, candidate_counts))
 
+    return RankingRun(
+        rankings=rankings,
+        device=resolved_device,
+        models=models,
+        profile=profile,
+        profile_path=profile_path,
+        ko_path=ko_path,
+        settings=settings,
+        embedder=embedder,
+        reranker=reranker,
+        querysets=querysets,
+    )
+
+
+def run_conditions(
+    conditions: Sequence[str] | None = None,
+    *,
+    device: str | None = None,
+    goldset_path: Path | None = None,
+    candidates_dir: Path | None = None,
+    models_path: Path | None = None,
+    profile_root: Path | None = None,
+    cache_dir: Path | None = None,
+    out: Path | None = None,
+    embedder: Embedder | None = None,
+    reranker: Reranker | None = None,
+    embedder_kind: str | None = None,
+    reranker_kind: str | None = None,
+    penalty_weight: float | None = None,
+) -> Path:
+    """골드셋의 모든 날짜에 대해 조건들을 돌리고 `eval/results.md` 를 씁니다.
+
+    경로·설정 인자의 기본값은 전부 `None` 이고 **호출 시점에** 해석합니다 (§9.1 / R7).
+    랭킹은 `compute_rankings` 가 만듭니다 — 라벨링 풀과 같은 코드입니다.
+    """
+    selected = _validate_conditions(conditions or DEFAULT_CONDITIONS)
+    goldset = load_goldset(goldset_path)
+
+    items_by_date: dict[str, list[Any]] = {
+        date: list(load_candidates(date, candidates_dir)) for date in goldset.dates
+    }
+    candidate_counts = {date: len(items) for date, items in items_by_date.items()}
+
+    run = compute_rankings(
+        selected,
+        items_by_date,
+        device=device,
+        models_path=models_path,
+        profile_root=profile_root,
+        cache_dir=cache_dir,
+        embedder=embedder,
+        reranker=reranker,
+        embedder_kind=embedder_kind,
+        reranker_kind=reranker_kind,
+        penalty_weight=penalty_weight,
+    )
+    # 판정 정보가 비어 있으면(손으로 만든 골드셋 등) None — 판정률 0.0 으로 찍히지 않게.
+    judged = goldset.judged or None
+    results = [
+        evaluate_condition(name, run.rankings[name], goldset.gold, candidate_counts, judged=judged)
+        for name in selected
+    ]
+
+    embedder_used, reranker_used = run.embedder, run.reranker
     meta = {
-        "device": resolved_device,
-        "models": models,
-        "profile_path": str(profile_path),
-        "ko_profile_path": str(ko_path) if ko_path else None,
+        "device": run.device,
+        "models": run.models,
+        "profile_path": str(run.profile_path),
+        "ko_profile_path": str(run.ko_path) if run.ko_path else None,
         "composition": "가중 최대 (§5.2 기본값)",
         # `build_queryset` 이 인자 > 프로파일 `selection.penalty_weight` > 기본값 순으로
         # 해석한 **실제 값**을 적습니다. 인자를 그대로 적으면 None 이 남습니다.
-        "penalty_weight": querysets["en"].penalty_weight if "en" in querysets else penalty_weight,
-        "top_n": settings.top_n,
-        "min_score": settings.min_score,
-        "embedder": _describe_model(embedder),
-        "reranker": _describe_model(reranker),
+        "penalty_weight": run.querysets["en"].penalty_weight
+        if "en" in run.querysets
+        else penalty_weight,
+        "top_n": run.settings.top_n,
+        "min_score": run.settings.min_score,
+        "embedder": _describe_model(embedder_used),
+        "reranker": _describe_model(reranker_used),
         # ★ 표의 `임베더 revision` 열은 **실제로 쓴** 구현체의 리비전입니다.
         #   models.yaml 의 카탈로그 값을 찍으면 스텁으로 돌린 표가 실모델 표로 보입니다.
-        "embedder_revision": getattr(embedder, "revision", None) if embedder is not None else None,
+        "embedder_revision": getattr(embedder_used, "revision", None)
+        if embedder_used is not None
+        else None,
         "stub_models": [
-            _describe_model(model) for model in (embedder, reranker) if is_stub_model(model)
+            _describe_model(model)
+            for model in (embedder_used, reranker_used)
+            if is_stub_model(model)
         ],
-        "max_seq_length": _max_seq_length(embedder),
+        "max_seq_length": _max_seq_length(embedder_used),
     }
     out = out or RESULTS_PATH
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -576,6 +701,33 @@ RESULT_COLUMNS: tuple[str, ...] = (
 
 def _fmt(value: float | None) -> str:
     return "—" if value is None else f"{value:.4f}"
+
+
+def _pooling_lines(goldset: Goldset) -> list[str]:
+    """라벨링 풀 구성 (docs/05_골드셋_풀링.md). 수치를 인용할 때 "전수 라벨링" 이라고
+    잘못 쓰지 않도록, 무엇을 판정했는지를 표 아래에 남깁니다."""
+    pooling = goldset.pooling or {}
+    if not pooling:
+        return ["- 라벨링 풀: 없음 — 후보 전체가 라벨링 대상 (실제 커버리지는 판정률 표)"]
+    lines: list[str] = []
+    for date in goldset.dates:
+        info = pooling.get(date)
+        if not info:
+            lines.append(f"- 라벨링 풀 {date}: 없음 — 후보 전체가 라벨링 대상")
+            continue
+        names = ", ".join(f"`{name}`" for name in info.get("conditions") or ())
+        missed = info.get("estimated_missed")
+        lines.append(
+            f"- 라벨링 풀 {date}: 후보 {info.get('candidates')}건 중 {info.get('pool_size')}건 — "
+            f"{names} 상위 {info.get('depth')} 합집합 {info.get('ranked_size')}건 + 풀 밖 무작위 "
+            f"{info.get('random_only_labeled')}건 (그중 관련 {info.get('random_only_relevant')}건 "
+            f"→ 랭킹 풀 밖 정답 추정 {'미상' if missed is None else f'약 {missed}건'})"
+        )
+    lines.append(
+        "  - 다중 시스템 풀링입니다. **전수 라벨링이 아닙니다.** 풀에 기여한 조건의 상위 10 은 "
+        "전부 판정됐고, MRR 은 첫 정답이 풀 깊이 밖이면 0 으로 셉니다 (영향 < 1/깊이)."
+    )
+    return lines
 
 
 def render_results(
@@ -657,6 +809,41 @@ def render_results(
             + " |"
         )
 
+    # ★ 판정률(judged@10) — 풀에 기여하지 않은 조건은 상위 10 에 미판정 항목이 섞이고,
+    #   미판정은 무관으로 세어져 **불리하게** 측정됩니다. 숫자 표만 인용되면 이 사실이
+    #   사라지므로 표 바로 아래에 둡니다 (docs/05_골드셋_풀링.md).
+    coverage = [
+        (result, [row.judged_at_10 for row in result.per_date if row.judged_at_10 is not None])
+        for result in results
+    ]
+    if any(values for _, values in coverage):
+        lines += [
+            "",
+            "## 판정률 — 상위 10 중 골드셋에 판정이 있는 비율 (judged@10)",
+            "",
+            "| 조건 | 최저 | 평균 |",
+            "|:--|--:|--:|",
+        ]
+        for result, values in coverage:
+            if values:
+                # 조건명을 백틱으로 감쌉니다 — 본 표의 `| baseline |` 행과 구분되게.
+                lines.append(
+                    f"| `{result.condition}` | {min(values):.2f} | {sum(values) / len(values):.2f} |"
+                )
+            else:
+                lines.append(f"| `{result.condition}` | — | — |")
+        short = [result.condition for result, values in coverage if values and min(values) < 1.0]
+        if short:
+            lines += [
+                "",
+                "> **⚠ 판정률 1.0 미만: "
+                + ", ".join(f"`{name}`" for name in short)
+                + "** — 상위 10 에 라벨이 없는 논문이 있고, 미판정은 무관으로 셉니다. "
+                "이 조건의 수치는 **실제보다 낮게** 나왔을 수 있습니다. "
+                "`python -m eval.pool --conditions <조건>` 으로 풀에 덧붙이고 새 항목을 "
+                "라벨링한 뒤 다시 돌리세요 (docs/05_골드셋_풀링.md).",
+            ]
+
     lines += ["", "## 조건", ""]
     for result in results:
         lines.append(f"- `{result.condition}` — {CONDITIONS[result.condition]}")
@@ -708,6 +895,7 @@ def render_results(
         + (f" / 한국어 대조군 `{meta.get('ko_profile_path')}`" if meta.get("ko_profile_path") else ""),
         f"- 골드셋: `{goldset.path}` (생성 {goldset.generated_at}, {len(goldset.dates)}일치)",
     ]
+    lines += _pooling_lines(goldset)
 
     if goldset.miss_rate is None:
         lines.append(

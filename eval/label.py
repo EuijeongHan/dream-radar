@@ -13,13 +13,21 @@
 평가 대상인 랭커가 정답셋의 범위를 정하게 되어, 랭커가 놓친 논문은 애초에 정답이 될
 기회가 없습니다. 개선폭이 실제보다 좋게 나옵니다 (풀링 편향).
 
-→ **전수 커버리지를 유지합니다.** 다만 1패스에서는 제목·카테고리만 보고 초 단위로
+→ **랭커 하나에 범위를 맡기지 않습니다.** 1패스에서는 제목·카테고리만 보고 초 단위로
    거릅니다. 대부분은 제목만으로 무관이 확실합니다. 애매하거나 관련 있어 보이는 것만
    2패스로 넘겨 초록을 읽습니다.
 
    1패스에서 거른 것도 `relevant: false`로 **정식 라벨**입니다. 다만 무엇을 근거로
    판정했는지(`basis: title` / `abstract`)를 남겨서, 나중에 "제목만 보고 놓친 게
    아닌가"를 검증할 수 있게 합니다.
+
+풀링 — 하루 1,000건을 다 볼 수 없어서 (docs/05_골드셋_풀링.md)
+-----------------------------------------------------------------
+`python -m eval.pool` 로 그날의 풀(`eval/pools/<날짜>.json`)을 만들면 1패스는 **풀 안의
+항목만** 돕니다 — 비교할 랭킹 조건 **전부**의 상위 30 합집합 + 풀 밖 무작위 50.
+위의 원칙은 **랭커 하나**가 범위를 정하는 것을 막는 것이고, 풀링은 모든 조건이 같은
+깊이로 기여하므로 그 안에 있습니다. 풀이 없으면 예전처럼 후보 전체를 돕니다.
+화면에는 순위도, 어느 조건이 뽑았는지도 보여주지 않습니다 — 랭커에 맞춰지지 않게.
 
 저장 구조
 --------
@@ -43,6 +51,9 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+
+from eval.pool import load_pool, pool_member_ids, random_only_members, ranked_members
+from src.core.config import resolve_profile  # R1 — 기준 문서도 최고 번호를 읽습니다
 
 CANDIDATES_DIR = Path("data/candidates")
 EVAL_DIR = Path("eval")
@@ -154,6 +165,31 @@ def available_dates(candidates_dir: Path | None = None) -> list[str]:
     return sorted(p.stem for p in candidates_dir.glob("*.jsonl"))
 
 
+def work_items(
+    date: str,
+    candidates_dir: Path | None = None,
+    journal_path: Path | None = None,
+    pools_dir: Path | None = None,
+) -> list[dict[str, Any]]:
+    """라벨링할 항목 — 풀이 있으면 **풀 ∪ 그날 이미 판정한 항목**, 없으면 후보 전체.
+
+    순서는 `load_candidates` 의 셔플 순서 그대로입니다 (터미널·모바일이 같은 순서).
+    풀을 만들기 전에 찍은 라벨도 남깁니다 — 빠지면 그 보류가 2패스에 영영 안 나오고
+    export 가 보류 때문에 막힙니다.
+    """
+    items = load_candidates(date, candidates_dir)
+    members = pool_member_ids(date, pools_dir)
+    if members is None:
+        return items
+    decided = {
+        item_id
+        for item_id, row in latest_by_item(load_journal(journal_path)).items()
+        if row["date"] == date
+    }
+    keep = members | decided
+    return [item for item in items if item["id"] in keep]
+
+
 #: 한국어 번역 병기 파일 (gitignore 대상인 data/cache/ 아래 — 재생성 가능한 파생물).
 #: 번역은 **보조 표시**일 뿐 판정 데이터가 아닙니다. 판정은 사람이 합니다.
 #: 없으면 도구는 원문만으로 그대로 동작합니다.
@@ -250,7 +286,7 @@ TRIAGE_HELP = f"""{BOLD}1패스 — 제목만 보고 거릅니다{RESET}
 
 def run_triage(date: str, journal_path: Path | None = None) -> None:
     journal_path = journal_path or JOURNAL_PATH
-    items = load_candidates(date)
+    items = work_items(date, journal_path=journal_path)
     translations = load_translations(date)
     total = len(items)
     # 판정 상태는 메모리에 들고 갑니다. 키 입력마다 원장 전체를 다시 읽으면
@@ -482,7 +518,7 @@ def run_recheck(date: str, sample: int = 40, journal_path: Path | None = None) -
                 for item_id in flipped:
                     print(f"  · {decided[item_id]['title'][:64]}")
                 print(
-                    "\n놓친 이유를 docs/라벨링_기준.md §5에 남기세요. "
+                    f"\n놓친 이유를 {_criteria_doc()} §5에 남기세요. "
                     "1패스 기준을 고쳐야 할 수도 있습니다."
                 )
             else:
@@ -539,10 +575,13 @@ def run_status(journal_path: Path | None = None) -> None:
         return
 
     print(f"{BOLD}골드셋 진행 상황{RESET}\n")
-    print(f"{'날짜':<12} {'후보':>6} {'판정':>6} {'보류':>6} {'관련':>6}  진행")
+    print(f"{'날짜':<12} {'대상':>6} {'판정':>6} {'보류':>6} {'관련':>6}  진행")
     print("─" * 68)
+    any_pooled = False
     for date in dates:
-        total = len(load_candidates(date))
+        pooled = pool_member_ids(date) is not None
+        any_pooled = any_pooled or pooled
+        total = len(work_items(date, journal_path=journal_path))
         rows = [r for r in decided.values() if r["date"] == date]
         counts = Counter(
             "pending" if r["relevant"] is None else ("yes" if r["relevant"] else "no")
@@ -550,13 +589,57 @@ def run_status(journal_path: Path | None = None) -> None:
         )
         settled = counts["yes"] + counts["no"]
         print(
-            f"{date:<12} {total:>6} {settled:>6} {counts['pending']:>6} "
+            f"{date + ('*' if pooled else ''):<12} {total:>6} {settled:>6} {counts['pending']:>6} "
             f"{counts['yes']:>6}  {progress_bar(settled, total, 20)}"
+        )
+    if any_pooled:
+        print(
+            f"{DIM}* 풀 적용 — 대상은 후보 전체가 아니라 풀(조건별 상위 30 합집합 + 무작위 50)"
+            f" ∪ 이미 판정한 항목입니다. docs/05_골드셋_풀링.md{RESET}"
         )
     print()
     labeled_dates = {r["date"] for r in decided.values()}
     if len(labeled_dates) < 3:
         print(f"{YELLOW}기획안 §9는 3일치를 요구합니다. 현재 {len(labeled_dates)}일치.{RESET}")
+
+
+def _criteria_doc() -> str:
+    """골드셋이 가리킬 라벨링 기준 문서 — **최고 번호** (CLAUDE.md §2 파일 번호 규칙)."""
+    try:
+        return resolve_profile("라벨링_기준", ".md", root=Path("docs")).as_posix()
+    except FileNotFoundError:
+        return "docs/라벨링_기준.md"
+
+
+def _pooling_summary(rows: list[dict[str, Any]], pools_dir: Path | None = None) -> dict[str, Any]:
+    """날짜별 풀 구성과 **랭킹 풀이 놓친 정답의 추정치** (docs/05_골드셋_풀링.md).
+
+    `estimated_missed` = 무작위 표본(풀 밖에서 뽑음)의 관련 비율 × 랭킹 풀 밖 후보 수.
+    표본에서 찾은 것도 포함한 "4조건 상위 30 이 모두 놓친 정답" 의 추정입니다.
+    표본이 50건이라 폭이 넓습니다 — 값 자체보다 0 이 아니라는 게 신호입니다.
+    """
+    labels = {r["item_id"]: r for r in rows}
+    out: dict[str, Any] = {}
+    for date in sorted({r["date"] for r in rows}):
+        pool = load_pool(date, pools_dir)
+        if pool is None:
+            continue
+        ranked = ranked_members(pool)
+        sampled = [item_id for item_id in random_only_members(pool) if item_id in labels]
+        found = sum(1 for item_id in sampled if labels[item_id]["relevant"])
+        outside = int(pool["candidates"]) - len(ranked)
+        out[date] = {
+            "depth": pool["depth"],
+            "conditions": list(pool["conditions"]),
+            "random_n": pool["random_n"],
+            "pool_size": len(pool["members"]),
+            "ranked_size": len(ranked),
+            "candidates": pool["candidates"],
+            "random_only_labeled": len(sampled),
+            "random_only_relevant": found,
+            "estimated_missed": round(found / len(sampled) * outside, 1) if sampled else None,
+        }
+    return out
 
 
 def run_export(journal_path: Path | None = None, out: Path | None = None) -> Path:
@@ -577,12 +660,13 @@ def run_export(journal_path: Path | None = None, out: Path | None = None) -> Pat
     recheck_rows = [r for r in rows if r["basis"] == "recheck"]
     recheck_total = len(recheck_rows)
     recheck_flipped = sum(1 for r in recheck_rows if r["relevant"])
+    pooling = _pooling_summary(rows)
 
     document = {
         "version": 1,
         "channel": "papers",
         # 라벨링 기준 문서 없이는 재현이 불가능합니다 (기획안 §9-4).
-        "criteria_doc": "docs/라벨링_기준.md",
+        "criteria_doc": _criteria_doc(),
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "summary": {
             "dates": sorted(by_date),
@@ -602,6 +686,9 @@ def run_export(journal_path: Path | None = None, out: Path | None = None) -> Pat
                 if recheck_total
                 else None,
             },
+            # 풀링으로 라벨링한 날의 구성. **이게 있으면 전수 라벨링이 아닙니다**
+            # (docs/05_골드셋_풀링.md). 풀 없이 라벨링했으면 키 자체가 없습니다.
+            **({"pooling": pooling} if pooling else {}),
         },
         "labels": [
             {
@@ -624,7 +711,13 @@ def run_export(journal_path: Path | None = None, out: Path | None = None) -> Pat
 
     print(f"{GREEN}{out}{RESET} — {len(rows)}건, 관련 {sum(relevant.values())}건")
     for date in sorted(by_date):
-        print(f"  {date}: 후보 {by_date[date]}건 중 관련 {relevant[date]}건")
+        print(f"  {date}: 판정 {by_date[date]}건 중 관련 {relevant[date]}건")
+        if date in pooling:
+            info = pooling[date]
+            print(
+                f"    풀 {info['pool_size']}건 / 후보 {info['candidates']}건 · "
+                f"무작위 표본 {info['random_only_labeled']}건 중 관련 {info['random_only_relevant']}건"
+            )
     if recheck_total:
         print(f"  1패스 재검토: 표본 {recheck_total}건 중 {recheck_flipped}건 뒤집힘")
     else:
