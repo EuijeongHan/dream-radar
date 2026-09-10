@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="3" fill="#1C2523">02 · 문제</text>
+  <text x="78" y="250" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="66" font-weight="800" fill="#1C2523">
+    <tspan x="78">기존 벤치마크는</tspan><tspan x="78" dy="92">탐색보다</tspan><tspan x="78" dy="92">기억을 시험할 수 있습니다.</tspan>
+  </text>
+  <rect x="78" y="590" width="924" height="385" rx="34" fill="#173C32"/>
+  <text x="130" y="680" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="29" font-weight="700" fill="#F4F0E8">익숙한 레시피를 불러오고</text>
+  <text x="130" y="746" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="29" font-weight="700" fill="#F4F0E8">몇 개의 하이퍼파라미터만 바꿔도</text>
+  <text x="130" y="812" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="29" font-weight="700" fill="#F4F0E8">좋은 점수를 얻는다면,</text>
+  <text x="130" y="900" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="38" font-weight="800" fill="#E6B84A">진짜 연구·개발 능력일까요?</text>
+  <text x="78" y="1088" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="29" fill="#42504D">
+    <tspan x="78">연구진은 답이 정해지지 않은 추론 서버 최적화로</tspan><tspan x="78" dy="48">에이전트의 실제 탐색 행동을 시험했습니다.</tspan>
+  </text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">02 / 05</text>
+</svg>

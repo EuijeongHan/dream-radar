@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="3" fill="#1C2523">04 · 결과</text>
+  <text x="78" y="245" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="64" font-weight="800" fill="#1C2523">
+    <tspan x="78">한 번 잘못 저장된 권한은</tspan><tspan x="78" dy="90">거의 그대로</tspan><tspan x="78" dy="90">행동이 됐습니다.</tspan>
+  </text>
+  <rect x="78" y="560" width="430" height="360" rx="34" fill="#D8E0DA"/>
+  <text x="120" y="645" font-family="Arial, sans-serif" font-size="78" font-weight="800" fill="#173C32">50.2%</text>
+  <text x="120" y="715" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="27" font-weight="800" fill="#173C32">거짓 권한 생성</text>
+  <text x="120" y="770" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="23" fill="#42504D"><tspan x="120">증분 기억 갱신에서</tspan><tspan x="120" dy="38">무권한 요청 기준 최대치</tspan></text>
+  <rect x="550" y="560" width="452" height="360" rx="34" fill="#173C32"/>
+  <text x="592" y="645" font-family="Arial, sans-serif" font-size="78" font-weight="800" fill="#D94E36">98.6%</text>
+  <text x="592" y="715" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="27" font-weight="800" fill="#F4F0E8">행동으로 전파</text>
+  <text x="592" y="770" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="23" fill="#D8E0DA"><tspan x="592">거짓 권한이 저장된 뒤</tspan><tspan x="592" dy="38">실행 모델이 요청을 수행한 비율</tspan></text>
+  <text x="78" y="1030" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="29" fill="#42504D">
+    <tspan x="78">정확한 상태로 기억만 교체하자 무권한 행동이 사라져,</tspan><tspan x="78" dy="48">오류의 원인이 기억에 있음을 확인했습니다.</tspan>
+  </text>
+  <text x="78" y="1170" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="22" fill="#65716E">※ 논문에 보고된 최대치 및 조건부 전파율이며 모델·조건별 차이가 있습니다.</text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">04 / 05</text>
+</svg>

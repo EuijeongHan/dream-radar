@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <circle cx="880" cy="225" r="170" fill="#D94E36"/>
+  <path d="M880 140a85 85 0 1 0 78 119" fill="none" stroke="#F4F0E8" stroke-width="19" stroke-linecap="round"/>
+  <path d="M955 209l13 55-56-10" fill="none" stroke="#F4F0E8" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="5" fill="#1C2523">FROM HAEWON · PAPER RADAR 001</text>
+  <text x="78" y="190" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="31" font-weight="700" fill="#D94E36">논문 한 편, 5장으로 읽기</text>
+  <text x="78" y="450" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="80" font-weight="800" fill="#1C2523">
+    <tspan x="78" dy="0">AI 에이전트의</tspan><tspan x="78" dy="112">실수를</tspan><tspan x="78" dy="112">되감을 수 있다면?</tspan>
+  </text>
+  <line x1="78" y1="855" x2="1002" y2="855" stroke="#1C2523" stroke-width="3"/>
+  <text x="78" y="915" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="23" font-weight="700" letter-spacing="2" fill="#65716E">TODAY'S PAPER</text>
+  <text x="78" y="974" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#D94E36">AgentRewind:</text>
+  <text x="78" y="1023" font-family="Arial, sans-serif" font-size="29" font-weight="600" fill="#42504D">Recoverable Execution for Long-Horizon</text>
+  <text x="78" y="1065" font-family="Arial, sans-serif" font-size="29" font-weight="600" fill="#42504D">LLM Agents</text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">01 / 05</text>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="3" fill="#1C2523">03 · 평가 방식</text>
+  <text x="78" y="245" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="65" font-weight="800" fill="#1C2523">
+    <tspan x="78">H100 한 장,</tspan><tspan x="78" dy="90">두 시간,</tspan><tspan x="78" dy="90">열린 선택지.</tspan>
+  </text>
+  <g font-family="Arial, 'Apple SD Gothic Neo', sans-serif">
+    <rect x="78" y="570" width="440" height="210" rx="30" fill="#D8E0DA"/>
+    <text x="118" y="640" font-size="23" font-weight="700" fill="#65716E">INPUT</text>
+    <text x="118" y="706" font-size="32" font-weight="800" fill="#173C32">기본 LLM + H100</text>
+    <text x="118" y="750" font-size="24" fill="#42504D">시나리오별 속도 목표</text>
+    <rect x="562" y="570" width="440" height="210" rx="30" fill="#D94E36"/>
+    <text x="602" y="640" font-size="23" font-weight="700" fill="#F4F0E8">MISSION</text>
+    <text x="602" y="706" font-size="31" font-weight="800" fill="#F4F0E8">추론 서버 설계</text>
+    <text x="602" y="750" font-size="24" fill="#F4F0E8">프레임워크부터 직접 선택</text>
+    <rect x="78" y="825" width="924" height="210" rx="30" fill="#173C32"/>
+    <text x="118" y="895" font-size="23" font-weight="700" fill="#E6B84A">PASS CONDITIONS</text>
+    <text x="118" y="956" font-size="29" font-weight="800" fill="#F4F0E8">품질 게이트 + 무결성 게이트 + 재실행 가능한 서버</text>
+    <text x="118" y="1000" font-size="23" fill="#D8E0DA">속도만 높이고 정답률을 버리거나 편법을 쓰면 탈락</text>
+  </g>
+  <text x="78" y="1135" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="27" fill="#42504D">프리필 · 디코딩 · 동시 처리 · 종합 성능을 각각 평가합니다.</text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">03 / 05</text>
+</svg>

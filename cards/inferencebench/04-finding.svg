@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="3" fill="#1C2523">04 · 발견</text>
+  <text x="78" y="245" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="64" font-weight="800" fill="#1C2523">
+    <tspan x="78">에이전트는 방법을 알았지만</tspan><tspan x="78" dy="90">다른 길을</tspan><tspan x="78" dy="90">거의 시험하지 않았습니다.</tspan>
+  </text>
+  <rect x="78" y="590" width="924" height="370" rx="34" fill="#173C32"/>
+  <text x="128" y="700" font-family="Arial, sans-serif" font-size="86" font-weight="800" fill="#E6B84A">93.9%</text>
+  <text x="128" y="758" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="29" font-weight="700" fill="#F4F0E8">최종 실행이 vLLM에 집중</text>
+  <line x1="128" y1="815" x2="952" y2="815" stroke="#6F8A80" stroke-width="2"/>
+  <text x="128" y="875" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="28" fill="#F4F0E8">2시간 동안 시도한 비기본 vLLM 설정 중앙값</text>
+  <text x="952" y="910" text-anchor="end" font-family="Arial, sans-serif" font-size="72" font-weight="800" fill="#D94E36">1개</text>
+  <text x="78" y="1060" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="29" fill="#42504D">
+    <tspan x="78">병목은 지식 부족보다 다양한 가설을 만들고,</tspan><tspan x="78" dy="48">체계적으로 비교해 최선안을 남기는 능력이었습니다.</tspan>
+  </text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">04 / 05</text>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="3" fill="#1C2523">03 · 연구진의 접근법</text>
+  <text x="78" y="255" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="68" font-weight="800" fill="#1C2523">
+    <tspan x="78">기억과 환경을</tspan><tspan x="78" dy="92">함께 저장합니다.</tspan>
+  </text>
+  <rect x="90" y="535" width="390" height="205" rx="28" fill="#D8E0DA"/>
+  <text x="285" y="620" text-anchor="middle" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="31" font-weight="700" fill="#1C2523">에이전트 컨텍스트</text>
+  <text x="285" y="676" text-anchor="middle" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="25" fill="#42504D">계획 · 기록 · 이전 시도</text>
+  <rect x="600" y="535" width="390" height="205" rx="28" fill="#E7C9BD"/>
+  <text x="795" y="620" text-anchor="middle" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="31" font-weight="700" fill="#1C2523">통제된 환경 상태</text>
+  <text x="795" y="676" text-anchor="middle" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="25" fill="#42504D">실행 중 실제로 바뀐 것</text>
+  <path d="M285 740V850H795V740M540 850V925" fill="none" stroke="#1C2523" stroke-width="7"/>
+  <rect x="280" y="925" width="520" height="120" rx="60" fill="#D94E36"/>
+  <text x="540" y="1000" text-anchor="middle" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="35" font-weight="800" fill="#F4F0E8">정렬된 체크포인트</text>
+  <text x="78" y="1155" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="30" fill="#42504D">두 상태를 맞춰 같은 시점의 체크포인트로 기록합니다.</text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">03 / 05</text>
+</svg>

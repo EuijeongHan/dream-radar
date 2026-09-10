@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#1C2523"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="3" fill="#E9E3D7">02 · 논문이 정의한 문제</text>
+  <text x="78" y="260" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="67" font-weight="800" fill="#F4F0E8">
+    <tspan x="78">초반의 오류는</tspan><tspan x="78" dy="92">이후 실행에 번집니다.</tspan>
+  </text>
+  <path d="M120 560H315L410 655 505 750 600 845 695 940H960" fill="none" stroke="#D94E36" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="315" cy="560" r="28" fill="#F4F0E8"/><circle cx="505" cy="750" r="28" fill="#F4F0E8"/><circle cx="695" cy="940" r="28" fill="#F4F0E8"/>
+  <text x="78" y="1085" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="34" fill="#E9E3D7">
+    <tspan x="78">오류는 에이전트 컨텍스트뿐 아니라</tspan><tspan x="78" dy="54">이미 바뀐 환경 상태에도 영향을 줍니다.</tspan>
+  </text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#AEB8B5">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#AEB8B5">02 / 05</text>
+</svg>

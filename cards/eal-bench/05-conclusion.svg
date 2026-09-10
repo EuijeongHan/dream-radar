@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="3" fill="#1C2523">05 · 결론</text>
+  <text x="78" y="230" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="60" font-weight="800" fill="#1C2523">
+    <tspan x="78">권한은 ‘기억’이 아니라</tspan><tspan x="78" dy="82">검증 가능한 원장에</tspan><tspan x="78" dy="82">남겨야 합니다.</tspan>
+  </text>
+  <rect x="78" y="500" width="924" height="300" rx="32" fill="#173C32"/>
+  <text x="126" y="580" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="25" font-weight="700" fill="#E6B84A">RADAR의 해석</text>
+  <text x="126" y="650" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="29" font-weight="800" fill="#F4F0E8"><tspan x="126">기억에는 출처와 유효기간을 붙이고,</tspan><tspan x="126" dy="50">실행 직전 권한은 별도 원장에서 다시 확인해야 합니다.</tspan></text>
+  <text x="126" y="755" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="22" fill="#D8E0DA">논문의 두 방어법은 오류를 줄였지만 정상 요청 거부도 늘렸습니다.</text>
+  <text x="78" y="858" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="23" fill="#65716E">※ 논문 본문·공식 저장소 기반 요약 · 논문 라이선스 CC BY 4.0</text>
+  <line x1="78" y1="910" x2="1002" y2="910" stroke="#1C2523" stroke-width="3"/>
+  <text x="78" y="960" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#D94E36">Agent Memory Is a Surface for Endogenous</text>
+  <text x="78" y="992" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#D94E36">Authorization Laundering</text>
+  <text x="78" y="1038" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="20" fill="#42504D">Tommaso Cerruti · Mika Okamoto · Ansel Kaplan Erol</text>
+  <text x="78" y="1074" font-family="Arial, sans-serif" font-size="20" fill="#42504D">arXiv:2609.01836 · arxiv.org/abs/2609.01836</text>
+  <text x="78" y="1128" font-family="Arial, sans-serif" font-size="19" fill="#65716E">Code: github.com/tommasocerruti/eal-bench · license not stated</text>
+  <text x="78" y="1192" font-family="Arial, sans-serif" font-size="20" fill="#65716E">© fromhaewon. All rights reserved.</text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">05 / 05</text>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="3" fill="#1C2523">05 · 결론</text>
+  <text x="78" y="235" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="61" font-weight="800" fill="#1C2523">
+    <tspan x="78">더 오래 생각하는 것보다</tspan><tspan x="78" dy="84">더 다양하게 실험하는</tspan><tspan x="78" dy="84">구조가 필요합니다.</tspan>
+  </text>
+  <g font-family="Arial, 'Apple SD Gothic Neo', sans-serif">
+    <rect x="78" y="530" width="276" height="245" rx="28" fill="#D8E0DA"/>
+    <text x="116" y="600" font-size="22" font-weight="700" fill="#65716E">BEST AGENT</text><text x="116" y="680" font-size="55" font-weight="800" fill="#173C32">8.08×</text><text x="116" y="728" font-size="22" fill="#42504D">PyTorch 기준 종합</text>
+    <rect x="390" y="530" width="276" height="245" rx="28" fill="#E6B84A"/>
+    <text x="428" y="600" font-size="22" font-weight="700" fill="#654E19">SIMPLE SEARCH</text><text x="428" y="680" font-size="55" font-weight="800" fill="#173C32">11.53×</text><text x="428" y="728" font-size="22" fill="#42504D">동일한 2시간 예산</text>
+    <rect x="702" y="530" width="300" height="245" rx="28" fill="#173C32"/>
+    <text x="740" y="600" font-size="22" font-weight="700" fill="#D8E0DA">VALID RUNS</text><text x="740" y="680" font-size="55" font-weight="800" fill="#D94E36">65.0%</text><text x="740" y="728" font-size="22" fill="#F4F0E8">180회 중 양쪽 게이트 통과</text>
+  </g>
+  <text x="78" y="850" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">
+    <tspan x="78">※ 논문 본문 및 공식 저장소 기반 요약.</tspan><tspan x="78" dy="38">Mistral-7B-Instruct-v0.3, H100 1장, 실행당 2시간 조건.</tspan>
+  </text>
+  <line x1="78" y1="955" x2="1002" y2="955" stroke="#1C2523" stroke-width="3"/>
+  <text x="78" y="1005" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#D94E36">InferenceBench: A Benchmark for Open-Ended LLM</text>
+  <text x="78" y="1038" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#D94E36">Inference Optimization by AI Agents</text>
+  <text x="78" y="1082" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="21" fill="#42504D">Jehyeok Yeon · Ben Rank · Maksym Andriushchenko</text>
+  <text x="78" y="1118" font-family="Arial, sans-serif" font-size="21" fill="#42504D">arXiv:2607.20468 · arxiv.org/abs/2607.20468</text>
+  <text x="78" y="1196" font-family="Arial, sans-serif" font-size="20" fill="#65716E">© fromhaewon. All rights reserved.</text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">05 / 05</text>
+</svg>

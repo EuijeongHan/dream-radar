@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <circle cx="875" cy="260" r="175" fill="#D94E36"/>
+  <path d="M785 282 C835 192 908 176 966 235" fill="none" stroke="#F4F0E8" stroke-width="18" stroke-linecap="round"/>
+  <path d="M950 198 L973 242 L925 246" fill="none" stroke="#F4F0E8" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="822" cy="270" r="18" fill="#F4F0E8"/><circle cx="880" cy="220" r="18" fill="#F4F0E8"/><circle cx="936" cy="254" r="18" fill="#F4F0E8"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="5" fill="#1C2523">FROM HAEWON · PAPER RADAR 002</text>
+  <text x="78" y="190" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="31" font-weight="700" fill="#D94E36">논문 한 편, 5장으로 읽기</text>
+  <text x="78" y="470" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="76" font-weight="800" fill="#1C2523">
+    <tspan x="78">AI 에이전트는</tspan><tspan x="78" dy="108">왜 정답을 알아도</tspan><tspan x="78" dy="108">덜 탐색할까요?</tspan>
+  </text>
+  <line x1="78" y1="855" x2="1002" y2="855" stroke="#1C2523" stroke-width="3"/>
+  <text x="78" y="915" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="2" fill="#65716E">TODAY'S PAPER</text>
+  <text x="78" y="980" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#D94E36">InferenceBench</text>
+  <text x="78" y="1030" font-family="Arial, sans-serif" font-size="27" font-weight="600" fill="#42504D">A Benchmark for Open-Ended LLM Inference</text>
+  <text x="78" y="1070" font-family="Arial, sans-serif" font-size="27" font-weight="600" fill="#42504D">Optimization by AI Agents</text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">01 / 05</text>
+</svg>

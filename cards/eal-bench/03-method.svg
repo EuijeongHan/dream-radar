@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="3" fill="#1C2523">03 · EAL-Bench</text>
+  <text x="78" y="245" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="63" font-weight="800" fill="#1C2523">
+    <tspan x="78">기억이 틀린 순간과</tspan><tspan x="78" dy="88">행동으로 번진 순간을</tspan><tspan x="78" dy="88">따로 측정합니다.</tspan>
+  </text>
+  <g font-family="Arial, 'Apple SD Gothic Neo', sans-serif">
+    <rect x="78" y="560" width="260" height="285" rx="30" fill="#D8E0DA"/>
+    <text x="112" y="630" font-size="22" font-weight="700" fill="#65716E">HISTORY</text><text x="112" y="700" font-size="29" font-weight="800" fill="#173C32">권한 변화</text><text x="112" y="748" font-size="23" fill="#42504D">허용·제한·철회</text>
+    <path d="M348 702h62" stroke="#D94E36" stroke-width="9"/><path d="M396 682l22 20-22 20" fill="none" stroke="#D94E36" stroke-width="9"/>
+    <rect x="410" y="560" width="260" height="285" rx="30" fill="#E6B84A"/>
+    <text x="444" y="630" font-size="22" font-weight="700" fill="#654E19">MEMORY</text><text x="444" y="700" font-size="29" font-weight="800" fill="#173C32">요약·갱신</text><text x="444" y="748" font-size="23" fill="#42504D">자유문 또는 구조화</text>
+    <path d="M680 702h62" stroke="#D94E36" stroke-width="9"/><path d="M728 682l22 20-22 20" fill="none" stroke="#D94E36" stroke-width="9"/>
+    <rect x="742" y="560" width="260" height="285" rx="30" fill="#173C32"/>
+    <text x="776" y="630" font-size="22" font-weight="700" fill="#D8E0DA">ACTION</text><text x="776" y="700" font-size="29" font-weight="800" fill="#F4F0E8">도구 실행</text><text x="776" y="748" font-size="23" fill="#D8E0DA">구매·보안·금융</text>
+  </g>
+  <rect x="78" y="900" width="924" height="195" rx="28" fill="#173C32"/>
+  <text x="118" y="970" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="25" font-weight="700" fill="#E6B84A">GROUND TRUTH</text>
+  <text x="118" y="1035" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="29" font-weight="800" fill="#F4F0E8">숨겨진 결정론적 원장이 실제 권한을 판정합니다.</text>
+  <text x="78" y="1170" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" fill="#42504D">5개 기억 작성 모델 × 2개 실행 모델 × 3개 업무 영역</text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">03 / 05</text>
+</svg>

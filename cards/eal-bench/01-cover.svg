@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#F4F0E8"/>
+  <circle cx="875" cy="260" r="175" fill="#D94E36"/>
+  <rect x="804" y="205" width="142" height="116" rx="18" fill="none" stroke="#F4F0E8" stroke-width="17"/>
+  <path d="M835 205v-28c0-55 80-55 80 0v28" fill="none" stroke="#F4F0E8" stroke-width="17" stroke-linecap="round"/>
+  <path d="M855 260l25 25 42-55" fill="none" stroke="#F4F0E8" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="78" y="92" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="26" font-weight="700" letter-spacing="5" fill="#1C2523">FROM HAEWON · PAPER RADAR 002</text>
+  <text x="78" y="190" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="31" font-weight="700" fill="#D94E36">논문 한 편, 5장으로 읽기</text>
+  <text x="78" y="465" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="75" font-weight="800" fill="#1C2523">
+    <tspan x="78">AI 에이전트의 기억이</tspan><tspan x="78" dy="108">없던 권한을</tspan><tspan x="78" dy="108">만들어낸다면?</tspan>
+  </text>
+  <line x1="78" y1="855" x2="1002" y2="855" stroke="#1C2523" stroke-width="3"/>
+  <text x="78" y="915" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="2" fill="#65716E">TODAY'S PAPER</text>
+  <text x="78" y="975" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#D94E36">Agent Memory Is a Surface for</text>
+  <text x="78" y="1022" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#D94E36">Endogenous Authorization Laundering</text>
+  <text x="78" y="1262" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#65716E">한해원의 관측소</text>
+  <text x="1002" y="1262" text-anchor="end" font-family="Arial, sans-serif" font-size="24" fill="#65716E">01 / 05</text>
+</svg>
