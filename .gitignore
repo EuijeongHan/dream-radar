@@ -48,3 +48,6 @@ site/resources/
 data/s3_manifest.json
 # RADAR_MODE=fake 로 돌렸을 때의 로컬 스토어. 실제 S3가 아닙니다.
 data/_fake_s3/
+# 검증용 임시 캡처·백업 — 이력서 페이지 캡처가 들어 있던 적이 있다 (공개 저장소)
+_check/
+*.bak
