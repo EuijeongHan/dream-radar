@@ -1,0 +1,447 @@
+{
+ "version": 1,
+ "date": "2026-09-11",
+ "candidates": 556,
+ "depth": 30,
+ "random_n": 50,
+ "seed": "radar-pool:2026-09-11",
+ "conditions": [
+  "baseline",
+  "bge_m3",
+  "bge_m3_ko",
+  "bge_m3_rerank"
+ ],
+ "builds": [
+  {
+   "at": "2026-09-11T08:19:42+00:00",
+   "conditions": [
+    "baseline",
+    "bge_m3",
+    "bge_m3_ko",
+    "bge_m3_rerank"
+   ],
+   "depth": 30,
+   "profile": "data/profile.papers_2.yaml",
+   "ko_profile": "data/profile.papers.ko_1.yaml",
+   "embedder": "bge_m3@5617a9f6",
+   "reranker": "bge_reranker_v2_m3@953dc6f6",
+   "device": "mps"
+  }
+ ],
+ "members": {
+  "arxiv:2609.09875": [
+   "baseline"
+  ],
+  "arxiv:2609.09882": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.09887": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.09889": [
+   "baseline"
+  ],
+  "arxiv:2609.09890": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.09891": [
+   "random"
+  ],
+  "arxiv:2609.09895": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.09898": [
+   "baseline",
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.09899": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.09901": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.09912": [
+   "random"
+  ],
+  "arxiv:2609.09920": [
+   "random"
+  ],
+  "arxiv:2609.09949": [
+   "baseline"
+  ],
+  "arxiv:2609.09957": [
+   "baseline"
+  ],
+  "arxiv:2609.09971": [
+   "random"
+  ],
+  "arxiv:2609.10017": [
+   "random"
+  ],
+  "arxiv:2609.10046": [
+   "baseline"
+  ],
+  "arxiv:2609.10125": [
+   "random"
+  ],
+  "arxiv:2609.10132": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.10135": [
+   "baseline"
+  ],
+  "arxiv:2609.10144": [
+   "random"
+  ],
+  "arxiv:2609.10187": [
+   "baseline"
+  ],
+  "arxiv:2609.10193": [
+   "random"
+  ],
+  "arxiv:2609.10210": [
+   "random"
+  ],
+  "arxiv:2609.10237": [
+   "baseline"
+  ],
+  "arxiv:2609.10253": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.10263": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.10266": [
+   "baseline"
+  ],
+  "arxiv:2609.10296": [
+   "random"
+  ],
+  "arxiv:2609.10303": [
+   "baseline"
+  ],
+  "arxiv:2609.10322": [
+   "random"
+  ],
+  "arxiv:2609.10350": [
+   "random"
+  ],
+  "arxiv:2609.10355": [
+   "baseline"
+  ],
+  "arxiv:2609.10387": [
+   "random"
+  ],
+  "arxiv:2609.10404": [
+   "random"
+  ],
+  "arxiv:2609.10430": [
+   "baseline"
+  ],
+  "arxiv:2609.10434": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.10495": [
+   "baseline"
+  ],
+  "arxiv:2609.10525": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.10534": [
+   "random"
+  ],
+  "arxiv:2609.10632": [
+   "random"
+  ],
+  "arxiv:2609.10706": [
+   "random"
+  ],
+  "arxiv:2609.10728": [
+   "random"
+  ],
+  "arxiv:2609.10746": [
+   "random"
+  ],
+  "arxiv:2609.10781": [
+   "random"
+  ],
+  "arxiv:2609.10787": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.10792": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.10810": [
+   "random"
+  ],
+  "arxiv:2609.10811": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.10826": [
+   "random"
+  ],
+  "arxiv:2609.10831": [
+   "random"
+  ],
+  "arxiv:2609.10855": [
+   "random"
+  ],
+  "arxiv:2609.10856": [
+   "random"
+  ],
+  "arxiv:2609.10879": [
+   "random"
+  ],
+  "arxiv:2609.10893": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.10901": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.10917": [
+   "baseline"
+  ],
+  "arxiv:2609.10939": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.10951": [
+   "random"
+  ],
+  "arxiv:2609.10981": [
+   "random"
+  ],
+  "arxiv:2609.10992": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.10996": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11020": [
+   "baseline"
+  ],
+  "arxiv:2609.11030": [
+   "random"
+  ],
+  "arxiv:2609.11060": [
+   "random"
+  ],
+  "arxiv:2609.11067": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11115": [
+   "baseline"
+  ],
+  "arxiv:2609.11129": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11144": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11146": [
+   "random"
+  ],
+  "arxiv:2609.11149": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11152": [
+   "random"
+  ],
+  "arxiv:2609.11155": [
+   "random"
+  ],
+  "arxiv:2609.11188": [
+   "baseline",
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.11202": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11209": [
+   "baseline"
+  ],
+  "arxiv:2609.11216": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11224": [
+   "baseline"
+  ],
+  "arxiv:2609.11234": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11244": [
+   "baseline"
+  ],
+  "arxiv:2609.11279": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.11281": [
+   "random"
+  ],
+  "arxiv:2609.11282": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11302": [
+   "random"
+  ],
+  "arxiv:2609.11315": [
+   "random"
+  ],
+  "arxiv:2609.11334": [
+   "baseline"
+  ],
+  "arxiv:2609.11341": [
+   "random"
+  ],
+  "arxiv:2609.11380": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.11403": [
+   "random"
+  ],
+  "arxiv:2609.11412": [
+   "baseline"
+  ],
+  "arxiv:2609.11414": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.11431": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11450": [
+   "baseline"
+  ],
+  "arxiv:2609.11452": [
+   "random"
+  ],
+  "arxiv:2609.11458": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11460": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11498": [
+   "baseline"
+  ],
+  "arxiv:2609.11519": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11524": [
+   "random"
+  ],
+  "arxiv:2609.11545": [
+   "baseline"
+  ],
+  "arxiv:2609.11572": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.11580": [
+   "random"
+  ],
+  "arxiv:2609.11615": [
+   "random"
+  ],
+  "arxiv:2609.11616": [
+   "random"
+  ],
+  "arxiv:2609.11620": [
+   "baseline"
+  ],
+  "arxiv:2609.11628": [
+   "random"
+  ],
+  "arxiv:2609.11646": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.11667": [
+   "bge_m3",
+   "bge_m3_ko",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11677": [
+   "random"
+  ],
+  "arxiv:2609.11697": [
+   "random"
+  ],
+  "arxiv:2609.11724": [
+   "random"
+  ],
+  "arxiv:2609.11758": [
+   "baseline"
+  ],
+  "arxiv:2609.11770": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.11772": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11786": [
+   "baseline"
+  ],
+  "arxiv:2609.11801": [
+   "random"
+  ],
+  "arxiv:2609.11804": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.11851": [
+   "bge_m3_ko"
+  ],
+  "arxiv:2609.11867": [
+   "random"
+  ],
+  "arxiv:2609.11878": [
+   "baseline"
+  ],
+  "arxiv:2609.11886": [
+   "bge_m3",
+   "bge_m3_rerank"
+  ],
+  "arxiv:2609.11904": [
+   "random"
+  ]
+ }
+}
