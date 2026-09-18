@@ -29,6 +29,11 @@
 2. **베이스라인** (§5.5) — 임베딩을 쓰지 않는 어휘 매칭이라 `src/rank` 에 둘 것이
    아닙니다. 베이스라인이 약하면 개선폭이 과장되므로 성실하게 만듭니다
 
+**주 지표는 nDCG@10 입니다** (docs/06_지표_결정.md, 2026-09-18). 라벨링 기준이 "관심사
+16개 중 하나에 닿는가" 로 넓어 하루 정답이 수십~수백 건이고, 그러면 Hit@5·MRR 이 거의 모든
+조건에서 1.0 에 붙습니다. 두 지표는 §5.4 요구라 계산·기록하지만 **조건 비교의 근거로 쓰지
+않습니다.** 보조로 P@10(상위 10 중 정답 비율)을 함께 냅니다.
+
 지표 정의는 §5.4 그대로입니다. 특히:
 - 정답이 0건인 날은 **평가에서 제외**하고 제외 사실을 results.md 에 남깁니다
 - 정답이 랭킹에 하나도 없으면 MRR 은 `1/∞` 가 아니라 **0**
@@ -149,6 +154,26 @@ def ndcg_at_10(ranked: Sequence[str], gold: Iterable[str], k: int = 10) -> float
     return dcg / idcg
 
 
+def precision_at_10(ranked: Sequence[str], gold: Iterable[str], k: int = 10) -> float | None:
+    """상위 k 중 정답 비율. **주 지표 nDCG@10 의 보조**입니다 (docs/06_지표_결정.md).
+
+    nDCG 와 달리 `|G_d|` 로 정규화하지 **않습니다** — "상위 10건을 열었을 때 몇 건이
+    읽을 만했나" 를 그대로 읽는 값이라 그게 목적입니다. 그래서 정답이 10건보다 적은 날은
+    상한이 `|G_d|/k` 로 내려갑니다. 지금 골드셋은 기준이 넓어(하루 수십~수백 건) 상한이
+    1.0 이지만, 기준을 좁히면 이 값의 해석이 달라집니다 — 그때 이 docstring 을 고치세요.
+
+    분모는 `min(k, len(ranked))` 입니다. 후보가 10건도 안 되는 날에 `k` 로 나누면 완벽한
+    랭킹도 1.0 이 못 됩니다.
+    """
+    gold = set(gold)
+    if not gold:
+        return None
+    top = list(ranked[:k])
+    if not top:
+        return 0.0
+    return sum(1 for item_id in top if item_id in gold) / len(top)
+
+
 @dataclass(frozen=True, slots=True)
 class DateResult:
     """날짜 1일치 결과. `candidates` 열은 results.md 에서 **뺄 수 없습니다** (§9.12)."""
@@ -159,6 +184,8 @@ class DateResult:
     hit_at_5: float
     mrr: float
     ndcg_at_10: float
+    #: 보조 지표 P@10 (§06). `|G_d|` 로 정규화하지 않은 상위 10 정답 비율입니다.
+    p_at_10: float
     #: 골드셋에 정답으로 라벨됐는데 그날 후보 풀에 없는 건수. 랭커의 잘못이 아니라
     #: 수집·중복제거 쪽 문제이므로 지표와 분리해 따로 기록합니다.
     gold_missing: int
@@ -210,7 +237,8 @@ def evaluate_condition(
             continue
         reciprocal = mrr(ranked, gold_ids)
         gain = ndcg_at_10(ranked, gold_ids)
-        if reciprocal is None or gain is None:  # 도달 불가. 도달했다면 조용히 넘기지 않습니다
+        precision = precision_at_10(ranked, gold_ids)
+        if reciprocal is None or gain is None or precision is None:  # 도달 불가
             raise RuntimeError(f"{date}: 지표가 정의되지 않았습니다 (정답 {len(gold_ids)}건)")
         rows.append(
             DateResult(
@@ -220,6 +248,7 @@ def evaluate_condition(
                 hit_at_5=hit,
                 mrr=reciprocal,
                 ndcg_at_10=gain,
+                p_at_10=precision,
                 gold_missing=len(gold_ids - set(ranked)),
                 judged_at_10=_judged_at(ranked, None if judged is None else judged.get(date, ())),
             )
@@ -694,9 +723,36 @@ RESULT_COLUMNS: tuple[str, ...] = (
     "Hit@5",
     "MRR",
     "nDCG@10",
+    # 보조 지표 (06_지표_결정.md). 열 순서는 §5.4 표기를 유지하고 **뒤에 붙입니다** —
+    # 앞에 끼우면 열 위치로 값을 읽는 테스트·스크립트가 조용히 다른 지표를 읽습니다.
+    "P@10",
     "장치",
     "임베더 revision",
 )
+
+#: 전 조건 평균이 이 값 이상이면 그 지표로는 조건을 가를 수 없습니다 (06_지표_결정.md §2).
+SATURATION = 0.99
+
+
+def _saturated_metrics(
+    results: Sequence[ConditionResult], threshold: float = SATURATION
+) -> list[str]:
+    """모든 조건의 평균이 `threshold` 이상인 지표. 넓은 라벨링 기준의 증상입니다.
+
+    경고를 붙이지 않으면 1.0 으로 찬 열이 "완벽한 랭킹" 으로 읽힙니다. 실제로는
+    정답이 하루 수백 건이라 아무 랭커나 맞히는 값입니다 (06_지표_결정.md §2).
+    """
+    saturated: list[str] = []
+    for label, field in (
+        ("Hit@5", "hit_at_5"),
+        ("MRR", "mrr"),
+        ("nDCG@10", "ndcg_at_10"),
+        ("P@10", "p_at_10"),
+    ):
+        values = [result.mean(field) for result in results]
+        if values and all(value is not None and value >= threshold for value in values):
+            saturated.append(label)
+    return saturated
 
 
 def _fmt(value: float | None) -> str:
@@ -751,6 +807,11 @@ def render_results(
         "",
         "`python -m eval.run_eval` 산출물입니다. **손으로 고치지 마세요** — 다시 돌리면 덮어씁니다.",
         "",
+        "> **주 지표는 nDCG@10 입니다** (docs/06_지표_결정.md). 라벨링 기준이 \"관심사 16개 중 "
+        "하나에 닿는가\" 로 넓어서 하루 정답이 수십~수백 건입니다. 그러면 Hit@5·MRR 은 거의 모든 "
+        "조건에서 1.0 에 붙어 **조건을 가르지 못합니다.** 두 열은 기획안 §5.4 가 요구해서 "
+        "남기지만 개선폭의 근거로 인용하지 마세요. 보조 지표는 P@10 입니다.",
+        "",
     ]
 
     if stubs:
@@ -769,7 +830,7 @@ def render_results(
 
     lines += [
         "| " + " | ".join(RESULT_COLUMNS) + " |",
-        "|:--|:--|--:|--:|--:|--:|--:|:--|:--|",
+        "|:--|:--|--:|--:|--:|--:|--:|--:|:--|:--|",
     ]
 
     for result in results:
@@ -785,6 +846,7 @@ def render_results(
                         _fmt(row.hit_at_5),
                         _fmt(row.mrr),
                         _fmt(row.ndcg_at_10),
+                        _fmt(row.p_at_10),
                         device,
                         revision[:8],
                     ]
@@ -802,12 +864,26 @@ def render_results(
                     _fmt(result.mean("hit_at_5")),
                     _fmt(result.mean("mrr")),
                     _fmt(result.mean("ndcg_at_10")),
+                    _fmt(result.mean("p_at_10")),
                     device,
                     revision[:8],
                 ]
             )
             + " |"
         )
+
+    # ★ 포화 경고 — 주 지표를 바꾼 이유가 표 안에서 확인돼야 합니다 (06_지표_결정.md).
+    saturated = _saturated_metrics(results)
+    if saturated:
+        lines += [
+            "",
+            "> **⚠ 포화: "
+            + ", ".join(f"`{name}`" for name in saturated)
+            + f"** — 모든 조건의 평균이 {SATURATION} 이상입니다. 이 지표로는 조건을 가를 수 "
+            "없습니다. 라벨링 기준이 넓어 예상된 결과이고(docs/06_지표_결정.md), 비교는 주 지표 "
+            "nDCG@10 으로 읽으세요. **nDCG@10 까지 포화했다면** 기준을 좁혀 골드셋을 다시 만들어야 "
+            "합니다 — 그 상태의 표는 어떤 조건이 나은지 말해 주지 못합니다.",
+        ]
 
     # ★ 판정률(judged@10) — 풀에 기여하지 않은 조건은 상위 10 에 미판정 항목이 섞이고,
     #   미판정은 무관으로 세어져 **불리하게** 측정됩니다. 숫자 표만 인용되면 이 사실이
@@ -855,14 +931,17 @@ def render_results(
             "",
             "## 베이스라인 대비 개선폭",
             "",
-            "| 조건 | ΔHit@5 | ΔMRR | ΔnDCG@10 |",
-            "|:--|--:|--:|--:|",
+            "주 지표는 **ΔnDCG@10** 입니다. 포화한 지표의 Δ 는 0 에 가깝게 나오는데, "
+            "그건 개선이 없다는 뜻이 아니라 그 지표가 천장에 닿았다는 뜻입니다 (06_지표_결정.md).",
+            "",
+            "| 조건 | ΔnDCG@10 (주) | ΔP@10 | ΔHit@5 | ΔMRR |",
+            "|:--|--:|--:|--:|--:|",
         ]
         for result in results:
             if result.condition == "baseline":
                 continue
             deltas = []
-            for field in ("hit_at_5", "mrr", "ndcg_at_10"):
+            for field in ("ndcg_at_10", "p_at_10", "hit_at_5", "mrr"):
                 mine, base = result.mean(field), baseline.mean(field)
                 deltas.append("—" if mine is None or base is None else f"{mine - base:+.4f}")
             lines.append(f"| {result.condition} | " + " | ".join(deltas) + " |")

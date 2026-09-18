@@ -37,6 +37,7 @@ from eval.run_eval import (
     mrr,
     ndcg_at_10,
     noun_phrase_terms,
+    precision_at_10,
     rank_items,
     run_conditions,
 )
@@ -620,7 +621,7 @@ def test_ko_condition_actually_loads_the_korean_control_profile(eval_env):
       영어: 정답 벡터 [1,0,0]·핵심관심사 [1,0,0] → base 1.0, 감점 0 → 1위·2위 → Hit@5=1
       한국어: 관심사가 전부 [0,0,1] → 무관 문서(6건)가 0.5, 정답(2건)이 0.0 →
               정답은 7·8위 → Hit@5=0
-    깨뜨리는 법: run_eval.run_conditions 에서 `ko_profile if name == "bge_m3_ko" else profile`
+    깨뜨리는 법: run_eval.compute_rankings 에서 `ko_profile if name == "bge_m3_ko" else profile`
     을 `profile` 로 바꾸면 두 조건이 같아져 빨간불.
     확인일: 2026-08-18
     """
@@ -637,7 +638,7 @@ def test_reranker_is_actually_called_on_stage1_top_n(eval_env):
     손계산: tmp 프로파일의 `stage1_top_n` 은 3, 평가 대상 날짜는 3일 →
             3 + 3 + 3 = 9쌍 (정답 0건인 날도 랭킹은 계산합니다).
 
-    깨뜨리는 법: run_conditions 의 `reranker=reranker if name == "bge_m3_rerank" else None`
+    깨뜨리는 법: compute_rankings 의 `reranker=reranker if name == "bge_m3_rerank" else None`
     을 `None` 으로 바꾸면 pairs_seen 이 0 이 되어 빨간불.
     확인일: 2026-08-18
     """
@@ -660,7 +661,7 @@ def test_runner_uses_the_cached_embedder_so_conditions_share_vectors(eval_env, t
     태우는 역할도 합니다 (포트 적합성 확인). 여기서 나온 수치는 의미가 없습니다 —
     `hash_stub` 으로 랭킹 품질을 재는 것은 금지입니다 (작업규약 §8-9).
 
-    깨뜨리는 법: run_eval.run_conditions 에서 조건마다 `build_embedder(...)` 를 새로
+    깨뜨리는 법: run_eval.compute_rankings 에서 조건마다 `build_embedder(...)` 를 새로
     만들도록 바꾸면 (캐시 디렉터리는 같아도 hits 가 0인 인스턴스가 생겨) 빨간불.
     확인일: 2026-08-18
     """
@@ -885,3 +886,87 @@ def test_noun_phrase_terms_are_shared_between_query_and_document():
     assert noun_phrase_terms("Cross-Encoder, reranking!") == noun_phrase_terms(
         "cross encoder reranking"
     )
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 주 지표 전환 — nDCG@10 (docs/06_지표_결정.md, 2026-09-18)
+# ══════════════════════════════════════════════════════════════════════════
+
+
+def test_precision_at_10_hand_computed():
+    """★ P@10 = 상위 10 중 정답 수 / min(10, 랭킹 길이). **|G| 로 정규화하지 않습니다.**
+
+    손계산: 5건 랭킹에 정답이 순위 2·4 → 2 / 5 = 0.4
+            12건 랭킹에 정답이 순위 1·2·11 → 상위 10 안에 2건 → 2 / 10 = 0.2
+
+    깨뜨리는 법: run_eval.precision_at_10 의 분모를 `len(gold)` 로 바꾸면 첫 assert 가
+    1.0 을 받아 빨간불. `ranked[:k]` 를 `ranked` 로 바꾸면 두 번째가 0.25 가 되어 빨간불.
+    확인일: 2026-09-18
+    """
+    assert precision_at_10(RANKED_5, GOLD_2_AND_4) == pytest.approx(0.4)
+    twelve = [f"x{i}" for i in range(1, 13)]
+    assert precision_at_10(twelve, {"x1", "x2", "x11"}) == pytest.approx(0.2)
+    assert precision_at_10(RANKED_5, set()) is None, "정답 0건인 날은 제외 신호 None"
+    assert precision_at_10([], {"정답"}) == 0.0
+
+
+def test_saturated_metrics_are_detected_and_flagged():
+    """★ 전 조건이 1.0 인 지표에 경고가 없으면 그 열이 "완벽한 랭킹" 으로 읽힙니다.
+
+    라벨링 기준이 넓어 하루 정답이 수십~수백 건이면 Hit@5·MRR 은 아무 랭커나 맞힙니다
+    (06_지표_결정.md §2). 그 사실이 표 안에 있어야 합니다.
+
+    손계산: 정답 1건을 두 조건이 모두 1위로 → Hit@5 = MRR = nDCG@10 = 1.0,
+            P@10 = 1/10 = 0.1 → 포화 목록은 앞의 셋뿐.
+            한 조건이 정답을 10위로 내리면 Hit@5 = 0.0 → 포화 없음.
+
+    깨뜨리는 법: render_results 의 포화 블록이나 _saturated_metrics 의 `all(...)` 을
+    지우면 빨간불.
+    확인일: 2026-09-18
+    """
+    date = "2026-08-12"
+    gold = {date: {"g1"}}
+    counts = {date: 10}
+    top = ["g1"] + [f"x{i}" for i in range(9)]
+    # 조건 이름은 CONDITIONS 에 있는 것만 씁니다 — render_results 가 설명을 찾습니다
+    perfect = evaluate_condition("bge_m3", {date: top}, gold, counts)
+    also = evaluate_condition("bge_m3_ko", {date: ["g1"] + [f"y{i}" for i in range(9)]}, gold, counts)
+    assert perfect.per_date[0].p_at_10 == pytest.approx(0.1)
+    assert run_eval._saturated_metrics([perfect, also]) == ["Hit@5", "MRR", "nDCG@10"]
+
+    weak = evaluate_condition("baseline", {date: [f"z{i}" for i in range(9)] + ["g1"]}, gold, counts)
+    assert run_eval._saturated_metrics([perfect, weak]) == []
+
+    goldset = run_eval.Goldset(
+        path=Path("g.yaml"),
+        dates=(date,),
+        gold={date: frozenset({"g1"})},
+        labeled={date: 10},
+        generated_at="t",
+        recheck_sampled=0,
+        recheck_flipped=0,
+        miss_rate=None,
+    )
+    text = run_eval.render_results([perfect, also], goldset, {})
+    assert "⚠ 포화" in text
+    first_line = text.split("⚠ 포화", 1)[1].split("\n", 1)[0]
+    assert "Hit@5" in first_line and "nDCG@10" in first_line
+
+
+def test_results_declares_ndcg_as_the_primary_metric(eval_env):
+    """★ 주 지표 선언이 없으면 포화한 Hit@5 가 개선폭 근거로 인용됩니다.
+
+    이 프로젝트에서 가장 비싼 오독입니다 — "Hit@5 0.9" 는 기준이 넓으면 자랑이 아닙니다
+    (06_지표_결정.md §6).
+
+    깨뜨리는 법: render_results 의 "주 지표는 nDCG@10" 배너를 지우거나
+    RESULT_COLUMNS 에서 "P@10" 을 빼면 빨간불.
+    확인일: 2026-09-18
+    """
+    table = _run(eval_env).read_text(encoding="utf-8")
+    header = next(line for line in table.splitlines() if line.startswith("| 조건 |"))
+    assert "P@10" in header
+    assert "주 지표는 nDCG@10" in table
+    assert "ΔnDCG@10" in table.split("베이스라인 대비 개선폭", 1)[1]
+    # 열 위치로 값을 읽는 기존 테스트가 있으므로 P@10 은 지표 열 **뒤에** 붙어야 합니다
+    assert header.index("Hit@5") < header.index("nDCG@10") < header.index("P@10")
