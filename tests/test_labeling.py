@@ -424,3 +424,27 @@ def test_tool_works_without_translations(workspace, monkeypatch, capsys):
 
 def test_load_translations_missing_returns_empty(workspace):
     assert L.load_translations("2099-01-01", workspace["candidates"].parent / "nope") == {}
+
+
+def test_triage_marks_relevant_from_the_title_alone(workspace, monkeypatch):
+    """★ 1패스에 '관련'(y)이 없으면 제목만 보고 관련인 논문을 a(초록) 경유로 찍게 되고,
+    basis 가 abstract 로 섞여 recheck 의 누락률 측정이 오염됩니다.
+
+    2026-09-04 에 모바일 UI 에 [관련] 을 넣은 것과 **같은 의미**를 터미널에도 둡니다.
+    두 도구가 같은 원장을 쓰는데 의미가 다르면 섞어 쓴 날의 라벨을 신뢰할 수 없습니다.
+
+    손계산: 후보 3건에 y·n·k → 관련 1 / 무관 1 / 보류 1, 그리고 y 의 basis 는 title.
+
+    깨뜨리는 법: run_triage 의 `elif key == "y"` 분기를 지우면 y 가 무시되고(else: continue)
+    입력이 한 칸 밀려 2건만 기록돼 빨간불.
+    확인일: 2026-11-02
+    """
+    write_candidates(workspace, "2026-08-12", 3)
+    feed(monkeypatch, "ynk")
+    L.run_triage("2026-08-12", workspace["journal"])
+
+    rows = L.latest_by_item(L.load_journal(workspace["journal"]))
+    assert len(rows) == 3, "y 가 라벨로 기록되지 않았습니다"
+    assert {r["relevant"] for r in rows.values()} == {True, False, None}
+    relevant = next(r for r in rows.values() if r["relevant"] is True)
+    assert relevant["basis"] == "title", "제목만 보고 내린 판정은 basis=title 이어야 합니다"

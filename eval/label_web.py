@@ -11,6 +11,10 @@
     k → [보류]           2패스 대상
     a → [초록 보기]      펼친 뒤의 판정은 basis=abstract (terminal의 a와 동일)
     u → [취소]
+    노트북에서는 같은 글자를 키보드로 눌러도 됩니다 (버튼에 글자가 표시됩니다).
+    **space 는 연결하지 않습니다** — 브라우저에서 space 는 스크롤 키라서, 긴 초록을
+    내리려다 무관이 찍힙니다. 터미널은 커서가 고정이라 space=무관 이 안전하지만
+    브라우저는 아닙니다.
     2패스(review)는 트리아지가 끝나면 자동으로 이어집니다. 초록이 항상 펼쳐지고
     메모 입력이 생깁니다.
 
@@ -166,6 +170,7 @@ button{flex:1;border:0;border-radius:12px;padding:16px 4px;font-size:15px;font-w
 a{color:var(--blue);text-decoration:none;font-size:13px}
 .days{display:flex;gap:8px;margin-bottom:4px}.days button{padding:9px;font-size:14px;font-weight:600}
 .days .on{background:var(--blue)}
+.kb{opacity:.5;font-weight:600;margin-left:5px;font-size:12px}
 </style></head><body>
 <div class="days" id="days"></div>
 <div class="bar"><i id="fill" style="width:0%"></i></div>
@@ -174,7 +179,7 @@ a{color:var(--blue);text-decoration:none;font-size:13px}
 <div id="main"></div>
 <div class="btns" id="btns"></div>
 <script>
-let DATE=null, CUR=null, ABS=false, LAST=null;
+let DATE=null, CUR=null, ABS=false, LAST=null, KEYS={};
 const $=id=>document.getElementById(id);
 async function j(url,opt){const r=await fetch(url,opt);return r.json()}
 async function loadDays(){
@@ -223,10 +228,21 @@ function render(keys){
   const map={n:['무관','bn',()=>send(false)],k:['보류','bk',()=>send(null)],
     a:['초록','ba',()=>{showAbs();render(['y','n','k','u'])}],  // 순서 동일
     y:['관련','by',()=>send(true)],u:['↩','bu',undo]};
-  $('btns').innerHTML='';
+  $('btns').innerHTML='';KEYS={};
   keys.forEach(k=>{const[t,c,f]=map[k];const b=document.createElement('button');
-    b.textContent=t;b.className=c;b.onclick=f;$('btns').appendChild(b)});
+    b.innerHTML=esc(t)+'<small class="kb">'+(k==='u'?'\u232b':k)+'</small>';
+    b.className=c;b.onclick=f;$('btns').appendChild(b);KEYS[k]=f});
 }
+// 노트북용 키보드. 지금 화면에 **있는** 버튼만 먹습니다 — 안 보이는 판정이 키로
+// 찍히면 안 됩니다. space 는 스크롤 키라 일부러 뺐습니다 (주석 참고).
+document.addEventListener('keydown',e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  const el=document.activeElement;
+  if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'))return;  // 메모 입력 중
+  const f=KEYS[e.key.toLowerCase()];
+  if(!f)return;
+  e.preventDefault();f();
+});
 async function send(rel){
   const basis=ABS?'abstract':'title';
   const label=CUR.title_ko||CUR.title;

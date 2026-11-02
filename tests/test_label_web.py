@@ -103,3 +103,25 @@ def test_status_lists_days(workspace):
     days = {d["date"]: d for d in W.api_status()["days"]}
     assert days["2026-08-12"]["total"] == 2
     assert days["2026-08-13"]["total"] == 3
+
+
+def test_web_page_binds_the_judgement_keys_for_laptop_use():
+    """노트북에서 110건을 트랙패드로 클릭하는 건 느립니다. 키보드 배선이 있어야 합니다.
+
+    ★ 이 테스트는 **존재 검사**입니다 — JS 를 실행하지 않으므로 "키가 실제로 먹는가" 는
+      브라우저에서 확인해야 합니다 (작업규약 §7.2 — 안 한 것은 안 했다고 적습니다).
+      그래도 배선이 통째로 사라지는 회귀와, 아래 두 함정의 재발은 잡습니다.
+
+    함정 1: 키는 **지금 화면에 있는 버튼만** 먹어야 합니다. KEYS 를 render() 안에서
+            다시 만드는 이유입니다 — 고정 맵이면 2패스에서 보이지도 않는 [보류]가 k 로
+            찍힙니다.
+    함정 2: space 는 연결하지 않습니다. 브라우저에서 space 는 스크롤 키라서 긴 초록을
+            내리려다 무관이 찍힙니다 (터미널은 커서가 고정이라 안전합니다).
+    확인일: 2026-11-02
+    """
+    page = W.PAGE
+    assert "addEventListener('keydown'" in page
+    assert "KEYS[k]=f" in page, "render() 가 현재 버튼으로 KEYS 를 다시 만들어야 합니다"
+    assert "KEYS={}" in page.split("function render(")[1], "render() 진입 시 KEYS 초기화"
+    assert "KEYS[' ']" not in page, "space 는 스크롤 키라 연결하지 않습니다"
+    assert "el.tagName==='INPUT'" in page, "메모 입력 중에는 키 판정이 먹으면 안 됩니다"

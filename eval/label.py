@@ -272,6 +272,7 @@ def progress_bar(done: int, total: int, width: int = 40) -> str:
 # ── 1패스: 제목 트리아지 ────────────────────────────────────────────────
 
 TRIAGE_HELP = f"""{BOLD}1패스 — 제목만 보고 거릅니다{RESET}
+  {BOLD}y{RESET}            관련     (relevant=true,  basis=title)
   {BOLD}n{RESET} / {BOLD}space{RESET}  무관     (relevant=false, basis=title)
   {BOLD}k{RESET}            보류     (2패스에서 초록을 읽고 판정)
   {BOLD}a{RESET}            초록 펼치기 — 그 자리에서 y/n/k 판정 (basis=abstract 로 기록)
@@ -279,7 +280,7 @@ TRIAGE_HELP = f"""{BOLD}1패스 — 제목만 보고 거릅니다{RESET}
   {BOLD}q{RESET}            저장하고 종료 (다시 실행하면 이어서 합니다)
 
 {DIM}확신이 없으면 k 입니다. 1패스의 목적은 판정이 아니라 '초록을 읽을 가치가 있는가'입니다.
-제목만으로 무관이 확실한 것만 n 하세요. a 를 남발하면 1패스의 속도 이점이 사라집니다 —
+제목만으로 무관이 확실한 것만 n, 관련이 확실한 것만 y 하세요. a 를 남발하면 1패스의 속도 이점이 사라집니다 —
 "제목이 애매한데 지금 궁금한" 것에만 쓰세요.{RESET}
 """
 
@@ -350,6 +351,11 @@ def run_triage(date: str, journal_path: Path | None = None) -> None:
                 label = Label(item["id"], date, item["title"], None, "title")
             else:
                 label = Label(item["id"], date, item["title"], sub == "y", "abstract")
+        elif key == "y":
+            # 제목만 보고 관련이 확실한 경우. 2026-09-04 에 모바일 UI 에 [관련] 을 넣었는데
+            # 터미널에는 없어서, 터미널 사용자는 a(초록)를 거쳐야 관련을 찍을 수 있었습니다.
+            # 그러면 basis 가 abstract 로 섞여 recheck 의 누락률 측정이 오염됩니다.
+            label = Label(item["id"], date, item["title"], True, "title")
         elif key == "k":
             label = Label(item["id"], date, item["title"], None, "title")
         elif key in ("n", " ", "\r", "\n"):
