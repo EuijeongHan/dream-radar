@@ -379,6 +379,10 @@ class Goldset:
     judged: Mapping[str, frozenset[str]] = field(default_factory=dict)
     #: export 가 남긴 날짜별 풀 요약 (`summary.pooling`). 풀 없이 라벨링했으면 None.
     pooling: Mapping[str, Any] | None = None
+    #: 넓은 '관련' 전체 (1등급 + 2등급). `gold` 와 다를 수 있습니다 — 아래 주석 참조.
+    broad_gold: Mapping[str, frozenset[str]] = field(default_factory=dict)
+    #: 등급이 매겨진 날짜. 이 날짜의 `gold` 는 **2등급만**입니다 (docs/07_등급_골드셋.md).
+    graded_dates: tuple[str, ...] = ()
 
 
 def load_goldset(path: Path | None = None) -> Goldset:
@@ -390,7 +394,10 @@ def load_goldset(path: Path | None = None) -> Goldset:
     if not isinstance(document, dict) or not document.get("labels"):
         raise SystemExit(f"{path} 에 labels 가 없습니다.\n\n{_LABELING_GUIDE}")
 
+    #: 평가용 정답. 등급이 있는 날은 **2등급만**, 없는 날은 넓은 '관련' 전체입니다.
     gold: dict[str, set[str]] = {}
+    broad: dict[str, set[str]] = {}
+    graded: set[str] = set()
     labeled: dict[str, int] = {}
     judged: dict[str, set[str]] = {}
     for row in document["labels"]:
@@ -402,11 +409,22 @@ def load_goldset(path: Path | None = None) -> Goldset:
         labeled[date] = labeled.get(date, 0) + 1
         judged.setdefault(date, set()).add(str(row["item_id"]))
         if row["relevant"]:
-            gold.setdefault(date, set()).add(str(row["item_id"]))
+            broad.setdefault(date, set()).add(str(row["item_id"]))
+        if row.get("grade") is not None:
+            graded.add(date)
+            # 1등급(닿기만)은 **오답**입니다. 넓은 기준에서는 무작위 표본의 49%가 관련으로
+            # 나와 지표가 무작위 랭커와 구분되지 않았습니다 (docs/07_등급_골드셋.md).
+            if int(row["grade"]) >= 2:
+                gold.setdefault(date, set()).add(str(row["item_id"]))
 
     summary = document.get("summary") or {}
     recheck = summary.get("title_pass_recheck") or {}
     dates = tuple(sorted(labeled))
+    # 등급을 안 매긴 날은 넓은 '관련' 을 그대로 정답으로 씁니다 — 등급 패스를 돌리기
+    # 전의 골드셋이 조용히 "정답 0건" 이 되지 않게.
+    for date in dates:
+        if date not in graded:
+            gold[date] = set(broad.get(date, ()))
     return Goldset(
         path=path,
         dates=dates,
@@ -418,6 +436,8 @@ def load_goldset(path: Path | None = None) -> Goldset:
         miss_rate=recheck.get("miss_rate"),
         judged={date: frozenset(judged.get(date, ())) for date in dates},
         pooling=summary.get("pooling") or None,
+        broad_gold={date: frozenset(broad.get(date, ())) for date in dates},
+        graded_dates=tuple(sorted(graded)),
     )
 
 
@@ -435,6 +455,7 @@ def embedding_ranking(
     penalty_weight: float | None = None,
     reranker: Reranker | None = None,
     profile: Mapping[str, Any] | None = None,
+    stats: dict[str, Any] | None = None,
 ) -> list[str]:
     """한 날짜의 후보를 랭킹해 `item_id` 리스트로 돌려줍니다.
 
@@ -445,12 +466,20 @@ def embedding_ranking(
 
     `rerank_stage2` 의 `final_n` 은 기본값이 5(발행 건수)이므로, 평가에서는 1차 통과
     건수를 그대로 넘겨 **자르지 않게** 합니다.
+
+    `stats` 를 주면 **리랭커가 실제로 몇 건을 받았는지**를 적습니다. 0 이면
+    `min_score_threshold` 가 그날 후보를 전부 걸렀다는 뜻이고, 그러면 리랭킹 조건은
+    임베딩 조건과 **같은 랭킹**이 됩니다. 2026-11-09 에 실제로 그랬습니다 (임계값 0.42
+    vs 1차 최고점 0.299 → 719건 전부 탈락). 아무것도 안 터지고 표만 거짓이 됩니다.
     """
     ranked = score_items(items, embedder, queryset, method=method, penalty_weight=penalty_weight)
     if reranker is None:
         return [row.item_id for row in ranked]
 
     head = select_stage1(ranked, stage1_settings(profile))
+    if stats is not None:
+        stats["stage1_kept"] = len(head)
+        stats["candidates"] = len(ranked)
     reranked = rerank_stage2(head, reranker, queryset, final_n=len(head))
     head_ids = [row.item_id for row in reranked]
     seen = set(head_ids)
@@ -484,6 +513,8 @@ class RankingRun:
     embedder: Embedder | None
     reranker: Reranker | None
     querysets: dict[str, Any]
+    #: `bge_m3_rerank` 가 1차에서 받은 건수 (날짜별). 0 이면 임계값이 전부 걸렀습니다.
+    stage1_kept: dict[str, int] = field(default_factory=dict)
 
 
 def compute_rankings(
@@ -544,6 +575,8 @@ def compute_rankings(
             )
 
     rankings: dict[str, dict[str, list[str]]] = {}
+    #: 리랭킹 조건이 1차에서 받은 건수 (날짜별). results.md 가 0 을 경고로 띄웁니다.
+    stage1_kept: dict[str, int] = {}
     for name in selected:
         if name == "baseline":
             interests = profile.get("interests") or ()
@@ -554,8 +587,11 @@ def compute_rankings(
                 for date, items in items_by_date.items()
             }
         else:
-            rankings[name] = {
-                date: embedding_ranking(
+            by_date: dict[str, list[str]] = {}
+            for date, items in items_by_date.items():
+                # 리랭킹 조건만 1차 통과 건수를 받아둡니다 (0 이면 표가 거짓입니다).
+                stats: dict[str, Any] | None = {} if name == "bge_m3_rerank" else None
+                by_date[date] = embedding_ranking(
                     items,
                     embedder,  # type: ignore[arg-type]  — 위에서 None 을 배제했습니다
                     querysets["ko"] if name == "bge_m3_ko" else querysets["en"],
@@ -563,9 +599,11 @@ def compute_rankings(
                     penalty_weight=penalty_weight,
                     reranker=reranker if name == "bge_m3_rerank" else None,
                     profile=profile,
+                    stats=stats,
                 )
-                for date, items in items_by_date.items()
-            }
+                if stats is not None and "stage1_kept" in stats:
+                    stage1_kept[date] = int(stats["stage1_kept"])
+            rankings[name] = by_date
 
     return RankingRun(
         rankings=rankings,
@@ -578,6 +616,7 @@ def compute_rankings(
         embedder=embedder,
         reranker=reranker,
         querysets=querysets,
+        stage1_kept=stage1_kept,
     )
 
 
@@ -657,6 +696,7 @@ def run_conditions(
             if is_stub_model(model)
         ],
         "max_seq_length": _max_seq_length(embedder_used),
+        "stage1_kept": run.stage1_kept,
     }
     out = out or RESULTS_PATH
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -757,6 +797,31 @@ def _saturated_metrics(
 
 def _fmt(value: float | None) -> str:
     return "—" if value is None else f"{value:.4f}"
+
+
+def _gold_definition_lines(goldset: Goldset) -> list[str]:
+    """무엇을 '정답' 으로 세었는가. 이 줄이 없으면 수치의 의미가 달라진 걸 아무도 모릅니다.
+
+    2026-11-09 에 정답의 정의가 바뀌었습니다 (docs/07_등급_골드셋.md): 넓은 '관련' →
+    2등급(실제로 읽었을 것). 같은 코드·같은 골드셋 파일이라도 정의가 다르면 수치를
+    비교할 수 없습니다.
+    """
+    strict = sum(len(ids) for ids in goldset.gold.values())
+    broad = sum(len(ids) for ids in (goldset.broad_gold or {}).values())
+    if goldset.graded_dates:
+        return [
+            f"- 정답 정의: **2등급(실제로 읽었을 것)** — 2등급 {strict}건 / 넓은 '관련' "
+            f"{broad}건. 등급 적용 날짜: {', '.join(goldset.graded_dates)}",
+            "  - 1등급(관심사에 닿기만 함)은 **오답**으로 셉니다. 넓은 '관련' 로 재면 무작위 "
+            "표본의 49%가 정답이어서 지표가 무작위 랭커와 구분되지 않았습니다 "
+            "(docs/07_등급_골드셋.md §1).",
+        ]
+    return [
+        f"- 정답 정의: 넓은 '관련' {strict}건 (**등급 미적용**). 2026-11-09 측정에서 편향 없는 "
+        "무작위 표본의 **49%**가 관련이었고, 그 정의로는 Hit@5 가 전 조건 1.0, nDCG@10 이 "
+        "무작위 랭커 기대값(0.49)과 구분되지 않았습니다. `python -m eval.label grade` 로 "
+        "2등급을 매긴 뒤 다시 돌리세요 (docs/07_등급_골드셋.md).",
+    ]
 
 
 def _pooling_lines(goldset: Goldset) -> list[str]:
@@ -885,6 +950,22 @@ def render_results(
             "합니다 — 그 상태의 표는 어떤 조건이 나은지 말해 주지 못합니다.",
         ]
 
+    # ★ 리랭커가 1차에서 0건을 받았으면 리랭킹 조건은 임베딩 조건과 **같은 랭킹**입니다.
+    #   2026-11-09 에 실제로 그랬고(임계값 0.42 vs 최고점 0.299), 표에는 두 조건이 따로
+    #   실려 있어서 "리랭커가 효과 없다" 로 읽혔습니다. 측정이 안 된 것과 효과가 없는 것은
+    #   다릅니다.
+    kept = meta.get("stage1_kept") or {}
+    starved = sorted(date for date, count in kept.items() if not count)
+    if starved:
+        lines += [
+            "",
+            f"> **⚠ 리랭커가 1차에서 0건을 받았습니다: {', '.join(starved)}** — "
+            "`min_score_threshold` 가 그날 후보를 전부 걸렀습니다. `bge_m3_rerank` 는 "
+            "`bge_m3` 와 **같은 랭킹**이고, 두 조건의 차이 0 은 '리랭커가 효과 없음' 이 "
+            "아니라 **'리랭커를 측정하지 않았음'** 입니다. 임계값을 실측 분포로 다시 "
+            "잡으세요 (§5.7 · docs/07_등급_골드셋.md).",
+        ]
+
     # ★ 판정률(judged@10) — 풀에 기여하지 않은 조건은 상위 10 에 미판정 항목이 섞이고,
     #   미판정은 무관으로 세어져 **불리하게** 측정됩니다. 숫자 표만 인용되면 이 사실이
     #   사라지므로 표 바로 아래에 둡니다 (docs/05_골드셋_풀링.md).
@@ -974,6 +1055,7 @@ def render_results(
         + (f" / 한국어 대조군 `{meta.get('ko_profile_path')}`" if meta.get("ko_profile_path") else ""),
         f"- 골드셋: `{goldset.path}` (생성 {goldset.generated_at}, {len(goldset.dates)}일치)",
     ]
+    lines += _gold_definition_lines(goldset)
     lines += _pooling_lines(goldset)
 
     if goldset.miss_rate is None:

@@ -2,6 +2,7 @@
 
     python -m eval.label triage  --date 2026-08-12    # 1패스: 제목만 보고 빠르게 거른다
     python -m eval.label review  --date 2026-08-12    # 2패스: 남은 것만 초록까지 읽고 판정
+    python -m eval.label grade   --date 2026-08-12    # 3패스: '관련' 중 읽었을 것을 가린다
     python -m eval.label recheck --date 2026-08-12    # 1패스 누락률 측정 (표본)
     python -m eval.label status                       # 진행률
     python -m eval.label export                       # eval/goldset.yaml 생성
@@ -28,6 +29,20 @@
 위의 원칙은 **랭커 하나**가 범위를 정하는 것을 막는 것이고, 풀링은 모든 조건이 같은
 깊이로 기여하므로 그 안에 있습니다. 풀이 없으면 예전처럼 후보 전체를 돕니다.
 화면에는 순위도, 어느 조건이 뽑았는지도 보여주지 않습니다 — 랭커에 맞춰지지 않게.
+
+3패스 — 왜 등급이 필요한가 (docs/07_등급_골드셋.md)
+----------------------------------------------------
+2026-11-09 실측: 편향 없는 무작위 표본 89건에서 **관련이 49%** 나왔습니다. 하루 후보의
+절반이 관련이면 어떤 랭커도 상위 10건을 관련으로 채우고, 그래서 Hit@5 는 전 조건 1.0,
+nDCG@10 은 무작위 랭커의 기대값(0.49)과 구분되지 않았습니다. **랭킹을 잴 수 없는 상태**
+입니다.
+
+→ '관련' 을 두 등급으로 가릅니다. 라벨을 뒤집는 게 아니라 **한 단계 더 가르는** 것입니다.
+
+    2등급  내일 아침 5건 안에 있었으면 링크를 눌렀을 것   → 평가의 정답
+    1등급  관심사에 닿기는 하지만 열지는 않았을 것        → 넓은 기준의 기록으로 남김
+
+무관은 그대로 둡니다 — 좁은 기준은 넓은 기준의 부분집합이라 무관은 계속 무관입니다.
 
 저장 구조
 --------
@@ -77,8 +92,11 @@ class Label:
     date: str
     title: str
     relevant: bool | None  # None = 2패스로 보류
-    basis: str  # "title" | "abstract"
+    basis: str  # "title" | "abstract" | "recheck" | "grade"
     note: str = ""
+    #: 2 = 읽었을 것(평가 정답) · 1 = 닿기만 함 · None = 아직 등급 안 매김 (§3패스).
+    #: `relevant` 를 대체하지 않습니다 — 1등급도 relevant=True 입니다.
+    grade: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -88,6 +106,7 @@ class Label:
             "relevant": self.relevant,
             "basis": self.basis,
             "note": self.note,
+            "grade": self.grade,
             "labeled_at": datetime.now(UTC).isoformat(timespec="seconds"),
         }
 
@@ -464,6 +483,101 @@ def run_review(date: str, journal_path: Path | None = None) -> None:
             decided[item_id] = label.to_dict()
 
 
+GRADE_HELP = f"""{BOLD}3패스 — '관련' 중에서 실제로 읽었을 것을 가립니다{RESET}
+  {BOLD}y{RESET}  2등급 — 내일 아침 5건 안에 있었으면 **링크를 눌렀을 것** (평가의 정답)
+  {BOLD}n{RESET}  1등급 — 관심사에 닿기는 하지만 열지는 않았을 것
+  {BOLD}m{RESET}  메모를 남기고 판정  (경계 사례는 꼭 남기세요)
+  {BOLD}u{RESET}  직전 취소     {BOLD}q{RESET}  저장하고 종료
+
+{DIM}1등급도 '관련' 입니다 — 라벨을 뒤집는 게 아니라 한 단계 더 가르는 것입니다.
+무작위 표본에서 관련이 49% 나왔습니다 (docs/07_등급_골드셋.md). 절반이 관련이면 랭킹을
+잴 수 없습니다. 2등급은 **하루 5건 안에 들 만한 것**으로 아껴 주세요 — 넉넉하게 주면
+이 패스를 한 의미가 없어집니다.{RESET}
+"""
+
+
+def graded_targets(date: str, journal_path: Path | None = None) -> list[str]:
+    """등급을 매길 대상 = 그날 '관련' 으로 판정된 항목. 후보 셔플 순서를 유지합니다."""
+    decided = latest_by_item(load_journal(journal_path))
+    return [
+        item["id"]
+        for item in load_candidates(date)
+        if (row := decided.get(item["id"])) is not None
+        and row["date"] == date
+        and row["relevant"] is True
+    ]
+
+
+def run_grade(date: str, journal_path: Path | None = None) -> None:
+    """'관련' 라벨에 2등급/1등급을 매깁니다 (docs/07_등급_골드셋.md).
+
+    무관·보류는 **건드리지 않습니다.** 좁은 기준은 넓은 기준의 부분집합이므로 무관을
+    다시 볼 이유가 없고, 보류가 남아 있으면 export 가 먼저 막습니다.
+    """
+    journal_path = journal_path or JOURNAL_PATH
+    items = {i["id"]: i for i in load_candidates(date)}
+    translations = load_translations(date)
+    decided = latest_by_item(load_journal(journal_path))
+    targets = graded_targets(date, journal_path)
+    if not targets:
+        print(f"{date}: '관련' 라벨이 없습니다. 먼저 triage·review 를 끝내세요.")
+        return
+
+    while True:
+        todo = [i for i in targets if decided[i].get("grade") is None]
+        if not todo:
+            clear()
+            read = [i for i in targets if decided[i].get("grade") == 2]
+            print(f"{GREEN}3패스 완료{RESET} — {date}")
+            print(f"관련 {len(targets)}건 중 2등급(읽었을 것) {len(read)}건")
+            for item_id in read:
+                print(f"  · {decided[item_id]['title'][:66]}")
+            print(f"\n다음: python -m eval.label export")
+            return
+
+        item_id = todo[0]
+        item = items[item_id]
+        tr = translations.get(item_id)
+        clear()
+        print(f"{BOLD}골드셋 라벨링 · 3패스(등급) · {date}{RESET}")
+        print(progress_bar(len(targets) - len(todo), len(targets)))
+        print()
+        print(GRADE_HELP)
+        print("─" * 72)
+        print(f"{BOLD}{item['title']}{RESET}")
+        if tr and tr.get("title_ko"):
+            print(f"{GREEN}{tr['title_ko']}{RESET}")
+        print()
+        _print_abstract(item, tr)
+        print()
+        print(f"{DIM}{', '.join(item['categories'])} · {item['url']}{RESET}")
+        print("─" * 72)
+
+        key = read_key()
+        if key == "q":
+            print("\n저장했습니다. 같은 명령으로 이어서 하세요.")
+            return
+        if key == "u":
+            undo_last(journal_path)
+            decided = latest_by_item(load_journal(journal_path))
+            continue
+
+        note = ""
+        if key == "m":
+            print()
+            note = read_line(f"{YELLOW}메모(왜 이 등급인가): {RESET}")
+            key = ""
+            while key not in ("y", "n"):
+                sys.stdout.write("y(2등급·읽었을 것) / n(1등급·닿기만): ")
+                sys.stdout.flush()
+                key = read_key()
+        if key in ("y", "n"):
+            # relevant 는 True 그대로입니다. 등급은 '관련' 안에서의 구분입니다.
+            label = Label(item_id, date, item["title"], True, "grade", note, 2 if key == "y" else 1)
+            append_label(label, journal_path)
+            decided[item_id] = label.to_dict()
+
+
 def _wrap(text: str, width: int) -> str:
     import textwrap
 
@@ -581,9 +695,10 @@ def run_status(journal_path: Path | None = None) -> None:
         return
 
     print(f"{BOLD}골드셋 진행 상황{RESET}\n")
-    print(f"{'날짜':<12} {'대상':>6} {'판정':>6} {'보류':>6} {'관련':>6}  진행")
+    print(f"{'날짜':<12} {'대상':>6} {'판정':>6} {'보류':>6} {'관련':>6} {'2등급':>6}  진행")
     print("─" * 68)
     any_pooled = False
+    ungraded_dates: list[tuple[str, int]] = []
     for date in dates:
         pooled = pool_member_ids(date) is not None
         any_pooled = any_pooled or pooled
@@ -594,9 +709,18 @@ def run_status(journal_path: Path | None = None) -> None:
             for r in rows
         )
         settled = counts["yes"] + counts["no"]
+        read = sum(1 for r in rows if r.get("grade") == 2)
+        ungraded = sum(1 for r in rows if r["relevant"] is True and r.get("grade") is None)
+        if ungraded:
+            ungraded_dates.append((date, ungraded))
         print(
             f"{date + ('*' if pooled else ''):<12} {total:>6} {settled:>6} {counts['pending']:>6} "
-            f"{counts['yes']:>6}  {progress_bar(settled, total, 20)}"
+            f"{counts['yes']:>6} {read:>6}  {progress_bar(settled, total, 20)}"
+        )
+    for date, count in ungraded_dates:
+        print(
+            f"{YELLOW}{date}: '관련' {count}건에 등급이 없습니다{RESET} — "
+            f"python -m eval.label grade --date {date}"
         )
     if any_pooled:
         print(
@@ -661,12 +785,34 @@ def run_export(journal_path: Path | None = None, out: Path | None = None) -> Pat
         raise SystemExit("라벨이 없습니다.")
 
     rows = sorted(decided.values(), key=lambda r: (r["date"], r["item_id"]))
+    # 등급을 매기기 시작한 날짜는 **전부** 매겨야 합니다. 절반만 매기면 등급 없는
+    # '관련' 이 평가에서 조용히 오답으로 세어져, 2등급 골드셋의 수치가 낮게 나옵니다.
+    graded_dates = {r["date"] for r in rows if r.get("grade") is not None}
+    ungraded = [
+        r for r in rows if r["relevant"] and r["date"] in graded_dates and r.get("grade") is None
+    ]
+    if ungraded:
+        raise SystemExit(
+            f"등급이 비어 있는 '관련' 라벨 {len(ungraded)}건 "
+            f"({', '.join(sorted({r['date'] for r in ungraded}))}).\n"
+            "등급을 매기기 시작한 날짜는 관련 라벨 **전부**에 등급이 있어야 합니다 — "
+            "일부만 매기면\n등급 없는 관련이 평가에서 오답으로 세어집니다.\n"
+            "  python -m eval.label grade --date <날짜>"
+        )
     by_date = Counter(r["date"] for r in rows)
     relevant = Counter(r["date"] for r in rows if r["relevant"])
     recheck_rows = [r for r in rows if r["basis"] == "recheck"]
     recheck_total = len(recheck_rows)
     recheck_flipped = sum(1 for r in recheck_rows if r["relevant"])
     pooling = _pooling_summary(rows)
+    grades = {
+        date: {
+            "relevant": relevant[date],
+            "read": sum(1 for r in rows if r["date"] == date and r.get("grade") == 2),
+            "touch": sum(1 for r in rows if r["date"] == date and r.get("grade") == 1),
+        }
+        for date in sorted(graded_dates)
+    }
 
     document = {
         "version": 1,
@@ -695,6 +841,9 @@ def run_export(journal_path: Path | None = None, out: Path | None = None) -> Pat
             # 풀링으로 라벨링한 날의 구성. **이게 있으면 전수 라벨링이 아닙니다**
             # (docs/05_골드셋_풀링.md). 풀 없이 라벨링했으면 키 자체가 없습니다.
             **({"pooling": pooling} if pooling else {}),
+            # 2등급(읽었을 것) / 1등급(닿기만). 이게 있으면 평가의 정답은 **2등급**입니다
+            # (docs/07_등급_골드셋.md). 없으면 넓은 '관련' 전체가 정답입니다.
+            **({"grades": grades} if grades else {}),
         },
         "labels": [
             {
@@ -706,6 +855,7 @@ def run_export(journal_path: Path | None = None, out: Path | None = None) -> Pat
                 # 놓친 게 아닌가"를 검증할 방법이 없습니다.
                 "basis": r["basis"],
                 "title": r["title"],
+                **({"grade": int(r["grade"])} if r.get("grade") is not None else {}),
                 **({"note": r["note"]} if r.get("note") else {}),
             }
             for r in rows
@@ -718,6 +868,9 @@ def run_export(journal_path: Path | None = None, out: Path | None = None) -> Pat
     print(f"{GREEN}{out}{RESET} — {len(rows)}건, 관련 {sum(relevant.values())}건")
     for date in sorted(by_date):
         print(f"  {date}: 판정 {by_date[date]}건 중 관련 {relevant[date]}건")
+        if date in grades:
+            g = grades[date]
+            print(f"    2등급(읽었을 것) {g['read']}건 · 1등급(닿기만) {g['touch']}건")
         if date in pooling:
             info = pooling[date]
             print(
@@ -749,6 +902,9 @@ def main(argv: list[str] | None = None) -> int:
     review = sub.add_parser("review", help="2패스 — 보류분의 초록을 읽고 판정")
     review.add_argument("--date", required=True)
 
+    grade = sub.add_parser("grade", help="3패스 — '관련' 중 실제로 읽었을 것을 가린다")
+    grade.add_argument("--date", required=True)
+
     recheck = sub.add_parser(
         "recheck", help="1패스 기각분 표본 재검토 — 제목만 보고 놓친 비율을 잰다"
     )
@@ -764,6 +920,8 @@ def main(argv: list[str] | None = None) -> int:
             run_triage(args.date)
         elif args.command == "review":
             run_review(args.date)
+        elif args.command == "grade":
+            run_grade(args.date)
         elif args.command == "recheck":
             run_recheck(args.date, args.sample)
         elif args.command == "status":

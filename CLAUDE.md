@@ -15,8 +15,9 @@
    `radar_기획안_1.md`·`radar_기획안.md`는 구버전이니 읽지 마세요
 2. `docs/radar_기획안_델타_v1.1.md` — 법적 근거(arXiv 라이선스·사람인 약관)의 **원문 인용**이
    필요할 때만. 결론은 기획안_2에 이미 반영돼 있습니다
-3. `data/profile.papers_2.yaml` — **최신** (VLA 관심사 편입). `_1`·번호없음은 구버전.
-   대조군은 `profile.papers.ko_1.yaml`.
+3. `data/profile.papers_3.yaml` — **최신** (2026-11-09: `min_score_threshold` 를 끔 —
+   0.42 는 1차 최고점 0.299 보다 높아 후보를 전부 걸러 리랭커를 굶겼습니다. docs/07 §1.1).
+   `_2`·`_1`·번호없음은 구버전. 대조군은 `profile.papers.ko_1.yaml`.
    `profile.papers.ko.yaml`은 **평가 대조군이니 운영에 로드하지 마세요**
 4. `data/profile.jobs_1.yaml` — **최신**. `profile.jobs.yaml`은 구버전
 

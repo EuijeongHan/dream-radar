@@ -448,3 +448,98 @@ def test_triage_marks_relevant_from_the_title_alone(workspace, monkeypatch):
     assert {r["relevant"] for r in rows.values()} == {True, False, None}
     relevant = next(r for r in rows.values() if r["relevant"] is True)
     assert relevant["basis"] == "title", "제목만 보고 내린 판정은 basis=title 이어야 합니다"
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 3패스 — 등급 (docs/07_등급_골드셋.md)
+# ══════════════════════════════════════════════════════════════════════════
+
+
+def _triage(workspace, monkeypatch, keys: str, date: str = "2026-08-12") -> None:
+    feed(monkeypatch, keys)
+    L.run_triage(date, workspace["journal"])
+
+
+def test_grade_splits_relevant_without_flipping_the_label(workspace, monkeypatch):
+    """★ 등급은 '관련' 을 뒤집는 게 아니라 **한 단계 더 가르는** 것입니다.
+
+    1등급도 relevant=True 로 남아야 넓은 기준의 기록이 보존되고, 나중에 "기준을 좁힌
+    것이 수치를 얼마나 바꿨나" 를 비교할 수 있습니다. relevant 를 False 로 덮으면
+    그 비교가 영구히 불가능해집니다.
+
+    손계산: 후보 3건을 y·y·n → 관련 2건. 등급 y·n → 2등급 1건 · 1등급 1건, relevant 는
+            둘 다 True.
+
+    깨뜨리는 법: run_grade 의 Label(..., True, "grade", ...) 에서 True 를 key == "y" 로
+    바꾸면 1등급이 무관이 되어 빨간불.
+    확인일: 2026-11-09
+    """
+    write_candidates(workspace, "2026-08-12", 3)
+    _triage(workspace, monkeypatch, "yyn")
+    feed(monkeypatch, "yn")
+    L.run_grade("2026-08-12", workspace["journal"])
+
+    rows = L.latest_by_item(L.load_journal(workspace["journal"]))
+    graded = {r["item_id"]: r for r in rows.values() if r.get("grade") is not None}
+    assert len(graded) == 2, "관련 2건에 등급이 붙어야 합니다"
+    assert sorted(r["grade"] for r in graded.values()) == [1, 2]
+    assert all(r["relevant"] is True for r in graded.values()), "1등급도 relevant=True 입니다"
+    assert all(r["basis"] == "grade" for r in graded.values())
+
+
+def test_grade_never_touches_irrelevant_or_pending(workspace, monkeypatch):
+    """★ 좁은 기준은 넓은 기준의 부분집합이라 무관을 다시 볼 이유가 없습니다.
+
+    무관까지 등급 대상에 넣으면 3패스가 2패스를 다시 하는 일이 되고, 라벨러가 같은
+    논문을 세 번 읽습니다.
+
+    손계산: y·n·k → 관련 1 · 무관 1 · 보류 1. 등급 대상은 관련 1건뿐.
+
+    깨뜨리는 법: graded_targets 의 `row["relevant"] is True` 를 `is not None` 으로
+    바꾸면 무관까지 들어와 빨간불.
+    확인일: 2026-11-09
+    """
+    write_candidates(workspace, "2026-08-12", 3)
+    _triage(workspace, monkeypatch, "ynk")
+    targets = L.graded_targets("2026-08-12", workspace["journal"])
+    assert len(targets) == 1
+
+    feed(monkeypatch, "y")
+    L.run_grade("2026-08-12", workspace["journal"])
+    rows = L.latest_by_item(L.load_journal(workspace["journal"]))
+    assert [r["grade"] for r in rows.values() if r.get("grade") is not None] == [2]
+    assert any(r["relevant"] is None for r in rows.values()), "보류는 그대로 남아야 합니다"
+
+
+def test_export_requires_every_relevant_to_be_graded_once_grading_started(workspace, monkeypatch):
+    """★ 절반만 등급을 매기면 등급 없는 '관련' 이 평가에서 **조용히 오답**으로 세어집니다.
+
+    그러면 2등급 골드셋의 nDCG 가 낮게 나오고, 원인이 라벨링 미완인지 랭커인지
+    구분할 수 없습니다. export 가 먼저 막습니다.
+
+    깨뜨리는 법: run_export 의 `ungraded` 게이트를 지우면 export 가 통과해 빨간불.
+    확인일: 2026-11-09
+    """
+    write_candidates(workspace, "2026-08-12", 3)
+    _triage(workspace, monkeypatch, "yyn")
+    feed(monkeypatch, "y")  # 관련 2건 중 1건만 등급
+    L.run_grade("2026-08-12", workspace["journal"])
+
+    with pytest.raises(SystemExit, match="등급"):
+        L.run_export(workspace["journal"], workspace["goldset"])
+
+
+def test_export_records_grade_counts_and_labels(workspace, monkeypatch):
+    """골드셋에 등급이 남아야 run_eval 이 2등급을 정답으로 고를 수 있습니다."""
+    write_candidates(workspace, "2026-08-12", 3)
+    _triage(workspace, monkeypatch, "yyn")
+    feed(monkeypatch, "yn")
+    L.run_grade("2026-08-12", workspace["journal"])
+
+    out = L.run_export(workspace["journal"], workspace["goldset"])
+    doc = yaml.safe_load(out.read_text(encoding="utf-8"))
+    assert doc["summary"]["grades"]["2026-08-12"] == {"relevant": 2, "read": 1, "touch": 1}
+    grades = sorted(row["grade"] for row in doc["labels"] if "grade" in row)
+    assert grades == [1, 2]
+    # 무관 라벨에는 grade 키가 없어야 합니다 (등급은 '관련' 안에서의 구분)
+    assert all("grade" not in row for row in doc["labels"] if not row["relevant"])

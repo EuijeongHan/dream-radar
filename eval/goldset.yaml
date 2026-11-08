@@ -1,0 +1,880 @@
+version: 1
+channel: papers
+criteria_doc: docs/라벨링_기준_2.md
+generated_at: '2026-11-02T18:17:18+00:00'
+summary:
+  dates:
+  - '2026-08-12'
+  total: 161
+  relevant: 87
+  per_date:
+    '2026-08-12':
+      candidates: 161
+      relevant: 87
+  title_pass_recheck:
+    sampled: 0
+    flipped_to_relevant: 0
+    miss_rate: null
+  pooling:
+    '2026-08-12':
+      depth: 30
+      conditions:
+      - baseline
+      - bge_m3
+      - bge_m3_ko
+      - bge_m3_rerank
+      random_n: 50
+      pool_size: 122
+      ranked_size: 72
+      candidates: 719
+      random_only_labeled: 50
+      random_only_relevant: 21
+      estimated_missed: 271.7
+labels:
+- date: '2026-08-12'
+  item_id: arxiv:2608.09139
+  relevant: false
+  basis: title
+  title: 'CodecArena: Codec Quality Assessment via Visual Reinforcement Learning'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09142
+  relevant: true
+  basis: title
+  title: An Agentic Generative Large Language Model for Treatment Planning of Colorectal Cancer
+- date: '2026-08-12'
+  item_id: arxiv:2608.09143
+  relevant: false
+  basis: title
+  title: 'UniMoFlow: Grounding Instruction-Driven 3D Human Motion Editing in Generation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09145
+  relevant: true
+  basis: abstract
+  title: 'Right Answer, Wrong Heat: Explanation-Aware Evaluation and Thermal-Grounded Feedback for MLLMs
+    on Infrared Images'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09147
+  relevant: true
+  basis: abstract
+  title: 'RefineAny3D: Depth Refinement as Semantic Alignment for Monocular 3D Detection'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09154
+  relevant: true
+  basis: abstract
+  title: 'UNSPECIFIC: General Constraint Synthesis for Breaking Copy-and-Paste Shortcut in LLM Instruction
+    Following'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09176
+  relevant: false
+  basis: title
+  title: Not All Visual Tokens Are Equally Safe to Remove:Consequence-Sensitive Visual Token Compression
+- date: '2026-08-12'
+  item_id: arxiv:2608.09208
+  relevant: false
+  basis: abstract
+  title: 'FedA2L: Adaptive layer-wise learning rate adjustment in decentralized federated learning'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09218
+  relevant: true
+  basis: title
+  title: Online Learning of Scale Parameters in Score-Driven Filters
+- date: '2026-08-12'
+  item_id: arxiv:2608.09222
+  relevant: true
+  basis: title
+  title: 'Reading Cognition as Decisions Unfold in Words: A Factorized Inverse Decision Model'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09230
+  relevant: true
+  basis: title
+  title: 'SafeSceneReason: A Multimodal Reasoning Benchmark Connecting Industrial Hazards with Accident
+    Knowledge'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09244
+  relevant: false
+  basis: title
+  title: In-Loop Model Adaptation with Coupled Latent-Noise Guidance for High-Fidelity Subject-Driven
+    Text-to-Image Generation
+- date: '2026-08-12'
+  item_id: arxiv:2608.09251
+  relevant: false
+  basis: title
+  title: 'MoRSE: Task-Oriented Multi-Agent System with Mixture of Role-Subtask Experts'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09255
+  relevant: false
+  basis: abstract
+  title: 'Full-Feature versus Limited-Input Machine Learning for Residential Energy Estimation: A Comparative
+    Analysis of RECS and ResStock Under Realistic Input Constraints'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09277
+  relevant: true
+  basis: abstract
+  title: 'P$^{3}$: Joint Program-and-Proof Planning for Verified Code Generation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09289
+  relevant: true
+  basis: title
+  title: Accurate but Natural? Diagnosing Grammatical and Idiomatic Gaps in Japanese EFL Writing
+- date: '2026-08-12'
+  item_id: arxiv:2608.09292
+  relevant: true
+  basis: abstract
+  title: 'Beyond the Capability Boundary: Zeroth-Order Optimization for Self-Evolving LLM Agents'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09311
+  relevant: false
+  basis: title
+  title: Degraded Infrared Small Object Detection via Degradation-Adapted Physics-Guided Restoration
+- date: '2026-08-12'
+  item_id: arxiv:2608.09322
+  relevant: false
+  basis: title
+  title: Diffusion Image Editing via Asynchronous Token Decoding
+- date: '2026-08-12'
+  item_id: arxiv:2608.09342
+  relevant: false
+  basis: title
+  title: 'Revisiting the Current Frame: Physical-Trace-Guided Network Output Correction for Video Restoration'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09369
+  relevant: true
+  basis: abstract
+  title: 'FeedbackTrack: Visual-Cortex-Inspired Cross-Frame Feedback for Transformer Tracking'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09374
+  relevant: false
+  basis: title
+  title: 'CircuitReason-1k: Benchmarking Long-Horizon Visual-to-Symbolic Reasoning inElectrical Circuits'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09380
+  relevant: false
+  basis: title
+  title: 'OpenLoopEvolve: A Verifiable Self-Evolution Framework for Loop Policies in Long-Horizon Complex
+    Tasks'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09388
+  relevant: false
+  basis: abstract
+  title: Efficient Human-Contact Representation for Human-Scene Interaction
+- date: '2026-08-12'
+  item_id: arxiv:2608.09398
+  relevant: false
+  basis: title
+  title: 'Monotonicity-Guided Bottom-Up Petri Net Discovery: The SPECpp Framework'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09403
+  relevant: true
+  basis: abstract
+  title: 'One Model to Magnify Them All: Efficient Scale-Invariant Histopathology via Conditional Normalization
+    and Continuous Magnification Training'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09405
+  relevant: false
+  basis: abstract
+  title: 'MeanSR: Restoration Trajectory Learning for One-Step Perceptual Super-Resolution'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09408
+  relevant: true
+  basis: abstract
+  title: DREAM Technical Report
+- date: '2026-08-12'
+  item_id: arxiv:2608.09424
+  relevant: true
+  basis: abstract
+  title: Reducing Pretraining-Generation Mismatch in Diffusion Language Models
+- date: '2026-08-12'
+  item_id: arxiv:2608.09427
+  relevant: false
+  basis: title
+  title: Foundation Models are Implicit Deepfake Detectors
+- date: '2026-08-12'
+  item_id: arxiv:2608.09432
+  relevant: true
+  basis: title
+  title: 'ZetaGPT: A Reference Implementation of Positional--Encoding--Free State--Space--Attention Language
+    Models'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09433
+  relevant: true
+  basis: title
+  title: How Simple Can It Get? From Interpretable Equations to Readable Rules for Financial Decision
+    Making
+- date: '2026-08-12'
+  item_id: arxiv:2608.09435
+  relevant: true
+  basis: title
+  title: 'Listen, See and Track: Spatio-Temporal Audio-Visual Sound Event Reasoning for Omni-Modal Language
+    Models'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09440
+  relevant: true
+  basis: title
+  title: 'MetaStrategy: Generative Ranking with Executable LLM Strategies'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09443
+  relevant: false
+  basis: title
+  title: Coupled Graph--Policy Distillation for Personalized Medication Safety in Older Adults with Multimorbidity
+- date: '2026-08-12'
+  item_id: arxiv:2608.09453
+  relevant: false
+  basis: title
+  title: 'Learning to Modulate, Not to Cycle: Soft Actor---Critic Recovers Inverter-Style Heat-Pump Control'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09474
+  relevant: true
+  basis: title
+  title: 'FaLCon: Facet-Anchored Retrieval with Late Consensus for Sim2Real Text-Based Person Anomaly
+    Search'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09493
+  relevant: false
+  basis: title
+  title: 'GeoRoute: Geometry-Aware Hybrid Inference for Traffic Future-Frame Prediction'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09507
+  relevant: true
+  basis: title
+  title: Learning Preference Adaptation for Large Language Model Personalization via Verbal Reinforcement
+    Learning
+- date: '2026-08-12'
+  item_id: arxiv:2608.09522
+  relevant: false
+  basis: abstract
+  title: 'TriView-YOLO: Early Multi-View Fusion for Ground Penetrating Radar Cavity Detection in Soft,
+    High-Water-Content Soils'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09529
+  relevant: false
+  basis: title
+  title: 'Towards Expressive and Faithful Audio-to-Image Generation: A Unified Multimodal Dataset and
+    Synthesis Framework'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09542
+  relevant: false
+  basis: title
+  title: 'Dual-Adversarial Safety Alignment: Cultivating Intrinsic Threat Comprehension in LRMs'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09548
+  relevant: true
+  basis: abstract
+  title: 'ELBench: A Multi-Dimensional Benchmark for Education-Facing Large Language Models'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09550
+  relevant: false
+  basis: abstract
+  title: 'PressureMesh: 3D Human Mesh Estimation from Multi-Device Pressure Images'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09558
+  relevant: true
+  basis: title
+  title: Training-Free Universal Approximation by Prompting Random Transformers
+- date: '2026-08-12'
+  item_id: arxiv:2608.09565
+  relevant: false
+  basis: abstract
+  title: 'Distributed Optimization with Streaming Data: A Temporal Weighting Perspective'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09568
+  relevant: false
+  basis: title
+  title: 'Se-DPO: Self-Evolving Token Credit for Direct Preference Optimization'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09573
+  relevant: true
+  basis: abstract
+  title: 'VideoVIBE: A Video-Grounded Diagnostic Benchmark for One-Shot Interactive Website Generation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09580
+  relevant: true
+  basis: abstract
+  title: 'CoRCi: Cross-Reconstruction of Coherent Interests Modeling in Cross-Domain Sequential Recommendation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09594
+  relevant: false
+  basis: title
+  title: Illusion or Integrity? Geometrical Consistency Metric for AIGC Video Quality Evaluation
+- date: '2026-08-12'
+  item_id: arxiv:2608.09595
+  relevant: true
+  basis: abstract
+  title: 'From Sweep to Seam: Interleaved Cross-Block Post-Training Quantization'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09596
+  relevant: true
+  basis: abstract
+  title: 'LEED: Local Embedding Evolution Distance for over-smoothing estimation and virtual node selection
+    in GNN'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09605
+  relevant: true
+  basis: title
+  title: 'TSPORec: Token Selection via Preference Optimization for LLM-Based Sequential Recommendation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09622
+  relevant: false
+  basis: abstract
+  title: Adaptive Sequential Test Planning for Multi-Mechanism Reliability Qualification via Bayesian
+    Monte Carlo Tree Search
+- date: '2026-08-12'
+  item_id: arxiv:2608.09643
+  relevant: false
+  basis: title
+  title: Activation Probes Surface Code-Security Signals that the Model's Output Misses
+- date: '2026-08-12'
+  item_id: arxiv:2608.09666
+  relevant: false
+  basis: title
+  title: 'Open Evaluation Agent: Efficient and Promptable Evaluation of Visual Generative Models'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09682
+  relevant: false
+  basis: title
+  title: 'Thinking With Tools, Not With Pixels: Tool Calls as Text Scaffolds for Visual Reasoning'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09683
+  relevant: true
+  basis: title
+  title: Deep Learning Imputation of Missing Radius of Maximum Winds (Rmax) Values in Tropical Cyclone
+    Best-Track Data
+- date: '2026-08-12'
+  item_id: arxiv:2608.09690
+  relevant: true
+  basis: title
+  title: 'Recurrent Neural Networks Beyond Time: Learning from Multiple Ordered Projections'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09691
+  relevant: true
+  basis: title
+  title: 'Diffuse the object, keep its label: curating detector training data from a few unlabeled photographs
+    via VLM-built 3D vegetation scenes'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09717
+  relevant: true
+  basis: title
+  title: How Do Large Language Models Judge Social Attraction? Evidence from Theory-Grounded Persona Ratings
+    Across Multiple LLMs and Humans
+- date: '2026-08-12'
+  item_id: arxiv:2608.09765
+  relevant: false
+  basis: title
+  title: 'REFRAMED: Towards Realistic Audio Description Generation for Movies'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09774
+  relevant: false
+  basis: abstract
+  title: 'C$^2$A: Coupling Spatial Evidence with Clinical Priors via Co-occurrence Aware Class Attention
+    for Multi-Label Chest X-Ray Classification'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09779
+  relevant: true
+  basis: title
+  title: 'KGCaRe: Explainable Complex Conditional Question Answering using Automatic Knowledge Graph Construction
+    and Context Retrieval with LLMs'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09789
+  relevant: false
+  basis: title
+  title: 'ADOPD: Reference-Privileged On-Policy Distillation for MLLM-Based Industrial Anomaly Detection'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09792
+  relevant: true
+  basis: title
+  title: Comparing British and American Audio Description of Movies
+- date: '2026-08-12'
+  item_id: arxiv:2608.09802
+  relevant: true
+  basis: title
+  title: 'SWE-Bench ProMax: Benchmarking Agents on Large-Scale Multilingual Code Refactoring'
+- date: '2026-08-12'
+  item_id: arxiv:2608.09870
+  relevant: false
+  basis: title
+  title: Logarithmic-Free Moment and Generalization Bounds for Uniformly Stable Algorithms
+- date: '2026-08-12'
+  item_id: arxiv:2608.09876
+  relevant: false
+  basis: abstract
+  title: Energy-Structured Latent World Models with Neural Time Fields for Physically Constistent Open-World
+    Motion Planning
+- date: '2026-08-12'
+  item_id: arxiv:2608.09898
+  relevant: true
+  basis: abstract
+  title: Consilience for Verifier-Free Test-Time Scaling
+- date: '2026-08-12'
+  item_id: arxiv:2608.09914
+  relevant: false
+  basis: abstract
+  title: Overcoming Data Scarcity and Confidentiality in Hardware Assurance via Synthetic Generation
+- date: '2026-08-12'
+  item_id: arxiv:2608.09925
+  relevant: true
+  basis: title
+  title: 'From Values to Benchmarks: Evaluating Large Language Models for Governmental Use in Dutch'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10057
+  relevant: true
+  basis: title
+  title: 'LEGO: Leveled Language Gaussian Splatting'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10084
+  relevant: false
+  basis: title
+  title: 'When Repository Labels Are Not Image-Level Truth: A Supervision Auditing Framework for Chest
+    Radiograph AI'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10090
+  relevant: false
+  basis: title
+  title: 'CHORUS: Complementary Experts for High-Coverage Testbench Stimulus Generation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10101
+  relevant: false
+  basis: title
+  title: Exploring Semantic Stability Across Reviews in the Linux Kernel
+- date: '2026-08-12'
+  item_id: arxiv:2608.10126
+  relevant: false
+  basis: title
+  title: Procedural Fairness Failures in RLHF from Preference Averaging
+- date: '2026-08-12'
+  item_id: arxiv:2608.10137
+  relevant: true
+  basis: title
+  title: 'The Parser Already Knows: Lightweight Bias Correction in Constrained Decoding'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10149
+  relevant: true
+  basis: title
+  title: 'REATS: LLM Reasoning-based Ensemble Learning for Adaptive Time Series Forecasting'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10176
+  relevant: true
+  basis: title
+  title: 'TRACE: Trustworthy Retrieval-Augmented Conversational Engine'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10182
+  relevant: false
+  basis: title
+  title: 'From Prediction to Incrementality: Causal Optimization for Large-Scale Targeting and Recommendation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10195
+  relevant: false
+  basis: title
+  title: 'More Accurate, Less Human: Gestalt Grouping in Vision Models'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10203
+  relevant: true
+  basis: title
+  title: A Convolutional Layer Activation Dimensionality Reduction for Out-of-Distribution and Adversarial
+    Attack Detection Methods
+- date: '2026-08-12'
+  item_id: arxiv:2608.10207
+  relevant: true
+  basis: abstract
+  title: Mitigating Bus Bunching with Reinforcement Learning Enhanced by Semantic Stop Embedding
+- date: '2026-08-12'
+  item_id: arxiv:2608.10216
+  relevant: true
+  basis: title
+  title: 'Similarity Gates Approve Reversals: A Validity Audit of Embedding-Cosine Thresholds in Agent
+    Systems'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10315
+  relevant: true
+  basis: title
+  title: Is This Your Final Answer? Cross-Contextual Consistency as a Measure of LLM Credibility
+- date: '2026-08-12'
+  item_id: arxiv:2608.10319
+  relevant: false
+  basis: title
+  title: Do Personalized Skills Help Coding Agents? An Empirical Study of Developer Interaction Histories
+- date: '2026-08-12'
+  item_id: arxiv:2608.10327
+  relevant: false
+  basis: title
+  title: Toward a Theory of Value in AI Alignment
+- date: '2026-08-12'
+  item_id: arxiv:2608.10332
+  relevant: false
+  basis: title
+  title: Topological Feasibility Guarantees for Differentiable Predictive Control
+- date: '2026-08-12'
+  item_id: arxiv:2608.10372
+  relevant: false
+  basis: title
+  title: Invertible Logits Transformation for Accuracy-Preserving Post-Hoc Uncertainty Calibration
+- date: '2026-08-12'
+  item_id: arxiv:2608.10375
+  relevant: true
+  basis: title
+  title: 'Beyond Forecasting: Recasting Volatility Control as a Routing Problem'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10385
+  relevant: true
+  basis: abstract
+  title: Persona Conditioning as an Assessor-Sensitivity Probe for LLM-Based IR Evaluation
+- date: '2026-08-12'
+  item_id: arxiv:2608.10396
+  relevant: false
+  basis: abstract
+  title: FormStruct-Bench:A Hierarchical and Diagnostic Benchmark for Table-Form Document Structure Recognition
+- date: '2026-08-12'
+  item_id: arxiv:2608.10400
+  relevant: true
+  basis: title
+  title: Do Judges Behave Like Algorithms?
+- date: '2026-08-12'
+  item_id: arxiv:2608.10406
+  relevant: true
+  basis: title
+  title: Post-Calibration Reliability Reranking of Relevance Decisions via Label-wise Monotone Projection
+- date: '2026-08-12'
+  item_id: arxiv:2608.10408
+  relevant: true
+  basis: title
+  title: 'VisEditBench: Can Vision-Language Models Edit Visualization Code from Multimodal Feedback?'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10414
+  relevant: true
+  basis: title
+  title: How Robust Are LLMs to Vietnamese Dialects?
+- date: '2026-08-12'
+  item_id: arxiv:2608.10420
+  relevant: false
+  basis: title
+  title: 'Reasoning Shortcuts and Value Symmetries: What Symmetry Permits, Architecture Realizes, and
+    Optimization Selects'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10424
+  relevant: true
+  basis: abstract
+  title: Recovering Wasted Compute in Autoresearch Agents
+- date: '2026-08-12'
+  item_id: arxiv:2608.10433
+  relevant: true
+  basis: title
+  title: 'Do Time-Series Forecasters Use the Right History: Recoverability, Recovery, and Functional Use
+    of Temporal Delays'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10444
+  relevant: true
+  basis: title
+  title: 'From Reasoning Depth to Reasoning Breadth: Evaluating Multi-Point Associative Reasoning in Large
+    Language Models'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10448
+  relevant: false
+  basis: abstract
+  title: Rationale-Guided Learning for Multimodal Emotion Recognition
+- date: '2026-08-12'
+  item_id: arxiv:2608.10450
+  relevant: false
+  basis: title
+  title: Persistent Recursive Worlds Enable Autonomous Software Evolution
+- date: '2026-08-12'
+  item_id: arxiv:2608.10459
+  relevant: true
+  basis: title
+  title: 'MD-ProTector: Positioning Multiple Data-Driven Prototypes for LLM-Generated Text Detection'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10474
+  relevant: false
+  basis: title
+  title: Stay or Stray - A Dynamical Systems Viewpoint of Popularity Bias
+- date: '2026-08-12'
+  item_id: arxiv:2608.10479
+  relevant: false
+  basis: title
+  title: 'Bridging Event Streams and DiT: Event-Guided Video Frame Interpolation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10480
+  relevant: true
+  basis: abstract
+  title: Multi-Granular Rationale-Guided Molecular LLM for Property Prediction
+- date: '2026-08-12'
+  item_id: arxiv:2608.10502
+  relevant: false
+  basis: title
+  title: 'From Faulty Memories to Corrected Actions: Dependency-Guided Rollback Repair for Memory-Augmented
+    Agents'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10503
+  relevant: true
+  basis: title
+  title: 'Every Token Counts: Exact Likert-Scale Distributions for Measuring LLM Attitudes and Biases'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10505
+  relevant: false
+  basis: title
+  title: 'RadFusion: Towards Threshold-Controllable Radiology Report Generation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10506
+  relevant: true
+  basis: title
+  title: 'CARB: A Characterization-Guided Framework for CNN Inference Cost Prediction and Deployment Screening'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10509
+  relevant: false
+  basis: title
+  title: 'MAP-Graph: Provenance-Aware Shared Memory for Multi-Agent Workflows'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10522
+  relevant: true
+  basis: title
+  title: Unlocking the Power of Medical Tabular Data via Semantic-Aware Multimodal Pre-training
+- date: '2026-08-12'
+  item_id: arxiv:2608.10524
+  relevant: true
+  basis: abstract
+  title: Rethinking Text-Based Image Retrieval in Specific Domain
+- date: '2026-08-12'
+  item_id: arxiv:2608.10526
+  relevant: false
+  basis: title
+  title: Coordinating the Unknown Lipschitz Constant in Multiplayer Bandits
+- date: '2026-08-12'
+  item_id: arxiv:2608.10528
+  relevant: true
+  basis: abstract
+  title: When Do Anchor-Based Pointwise LLM Rerankers Help? Retriever Quality, Statistical Scope, and
+    Anchor Design
+- date: '2026-08-12'
+  item_id: arxiv:2608.10529
+  relevant: false
+  basis: abstract
+  title: Robust Multi-Agent Bandits with Heavy-Tailed Rewards and Information Asymmetry
+- date: '2026-08-12'
+  item_id: arxiv:2608.10535
+  relevant: true
+  basis: title
+  title: Multi Interests for Joint Search-Recommendation Modeling
+- date: '2026-08-12'
+  item_id: arxiv:2608.10538
+  relevant: true
+  basis: title
+  title: 'SKILLER: Language-Level Reinforcement Learning for Reusable Skill Extraction in Small Language
+    Models'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10595
+  relevant: false
+  basis: abstract
+  title: 'DegradeQuery: Counterfactual Tuple Pretraining for Context-Aware PROTAC Degradation Prediction'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10599
+  relevant: true
+  basis: abstract
+  title: '$β$-VAEs as Effective Theories: Tolerance-Dependent Dimension'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10634
+  relevant: false
+  basis: abstract
+  title: 'IADD-TR: Intervention-Aware Dynamics Decoupling with Targeted Regularization for Model-Based
+    Reinforcement Learning'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10684
+  relevant: false
+  basis: abstract
+  title: Embedding Rotation Invariance for Provable Multi-Oriented Scene Text Recognition
+- date: '2026-08-12'
+  item_id: arxiv:2608.10688
+  relevant: false
+  basis: title
+  title: 'Leveraging Human Reading Behavior for Keyphrase Extraction: A Webcam-based Eye-tracking Corpus'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10706
+  relevant: true
+  basis: abstract
+  title: MMArt A Multi-Perspective Multimodal Dataset for Visual Art Understanding
+- date: '2026-08-12'
+  item_id: arxiv:2608.10708
+  relevant: false
+  basis: abstract
+  title: 'Self-Geometry: GT-Free and Plug-and-Play Test-Time Adaptation for Geometrically Consistent 3D
+    Vision Foundation Models'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10714
+  relevant: true
+  basis: title
+  title: Conversational Orchestration for Organic 6G
+- date: '2026-08-12'
+  item_id: arxiv:2608.10723
+  relevant: true
+  basis: abstract
+  title: 'Grid-Preserving Knowledge Distillation: Transferring Convolutional Inductive Bias to Vision
+    Transformers under Data Scarcity'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10730
+  relevant: true
+  basis: title
+  title: Smart Enough to Go Extinct? An Evolutionary Challenge to the Value of General Intelligence and
+    Its Ethical Implications for AGI
+- date: '2026-08-12'
+  item_id: arxiv:2608.10743
+  relevant: true
+  basis: title
+  title: Mitigating Context Interference for Reliable and Efficient Search Agents
+- date: '2026-08-12'
+  item_id: arxiv:2608.10758
+  relevant: true
+  basis: title
+  title: 'Where To Look? : Causal Tracing of Vision Encoders in VLM'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10765
+  relevant: false
+  basis: abstract
+  title: Compositional Benchmark Synthesis for Hierarchical Human Action Recognition
+- date: '2026-08-12'
+  item_id: arxiv:2608.10775
+  relevant: false
+  basis: title
+  title: 'SkillLens: Visual Skill Cards for Retrieval-Augmented GUI Action Prediction and On-Policy Distillation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10795
+  relevant: true
+  basis: abstract
+  title: 'EvoMem: Memory-Augmented Evolution for Code Optimization'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10835
+  relevant: true
+  basis: title
+  title: 'UniProbe: A Learnable Token-Level Hallucination Detector for Large VLMs using Multi-Structural
+    Internal Representations'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10870
+  relevant: true
+  basis: title
+  title: 'NullEdit: Stealthy Image Protection via VLM Condition Redirection'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10878
+  relevant: false
+  basis: abstract
+  title: 'X2-Turn: Frame-Synchronous Dual-Head Modeling for Joint Streaming ASR and Turn State Prediction'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10885
+  relevant: true
+  basis: title
+  title: 'ConfTriage: A Calibration-Aware LLM Triage Framework for Pulmonary Nodule Malignancy with Selective
+    Specialist Deferral'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10893
+  relevant: false
+  basis: title
+  title: 'Certify or Refuse: A Cross-Model Map for Selective Risk Control with Coverage Floors under Covariate
+    Shift'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10896
+  relevant: false
+  basis: abstract
+  title: Self-Normalized Inference for Constant-Stepsize Temporal-Difference Learning under Markovian
+    Sampling
+- date: '2026-08-12'
+  item_id: arxiv:2608.10905
+  relevant: true
+  basis: abstract
+  title: ReOrder-OPD:Reliability-Aware Prompt Ordering for On-Policy Distillation
+- date: '2026-08-12'
+  item_id: arxiv:2608.10908
+  relevant: true
+  basis: title
+  title: 'Order Matters: LVLMs as Judges for Temporal Reasoning in Image Sequences'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10916
+  relevant: false
+  basis: title
+  title: 'FaithformBench: Benchmarking Faithfulness of Mathematical Chain-of-Thought Autoformalisation'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10932
+  relevant: false
+  basis: title
+  title: Temporally Grounded Compositional Camera Motion Understanding via Geometric Knowledge Distillation
+- date: '2026-08-12'
+  item_id: arxiv:2608.10939
+  relevant: true
+  basis: abstract
+  title: A Cost-Efficient Routing Pipeline for Multilingual Short-Text Classification Using Small Language
+    Models
+- date: '2026-08-12'
+  item_id: arxiv:2608.10970
+  relevant: true
+  basis: abstract
+  title: 'ReLTEx: Reliable LLM-based Taxonomy Expansion'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10976
+  relevant: true
+  basis: abstract
+  title: 'XCoT-VLA: Executable Chain-of-Thought for Vision-Language-Action Driving'
+- date: '2026-08-12'
+  item_id: arxiv:2608.10986
+  relevant: true
+  basis: abstract
+  title: What Iterated Self-Feeding Probes of Language Models Measure, and a test that separates the construction
+    from the model
+- date: '2026-08-12'
+  item_id: arxiv:2608.11002
+  relevant: true
+  basis: abstract
+  title: On the Limitations of Cross-Lingual Consistency in Multilingual Text-to-image Generation
+- date: '2026-08-12'
+  item_id: arxiv:2608.11022
+  relevant: false
+  basis: title
+  title: 'Workflow Cards: Structured Summaries of Workflow Executions Using Provenance Data'
+- date: '2026-08-12'
+  item_id: arxiv:2608.11025
+  relevant: true
+  basis: title
+  title: Data Attribution of Emergent Misalignment with Persona Features
+- date: '2026-08-12'
+  item_id: arxiv:2608.11027
+  relevant: true
+  basis: title
+  title: Mapping and Measuring the Behavioral Evolution of Large Language Models
+- date: '2026-08-12'
+  item_id: arxiv:2608.11030
+  relevant: true
+  basis: title
+  title: Self-Knowledge Retrieval Augmented Generation Framework for Patent Matching
+- date: '2026-08-12'
+  item_id: arxiv:2608.11036
+  relevant: true
+  basis: title
+  title: 'myMediWhisper: Construction of Burmese Medical Speech Corpus and Whisper Fine-Tuning for Clinical
+    Dialogue ASR'
+- date: '2026-08-12'
+  item_id: arxiv:2608.11064
+  relevant: false
+  basis: title
+  title: Entropy-Centric Explainable AI for Remote Sensing Image Segmentation
+- date: '2026-08-12'
+  item_id: arxiv:2608.11074
+  relevant: false
+  basis: title
+  title: 'CapProbe: Evaluating Detailed Image Captions via Full-Scene Dense Question Answering'
+- date: '2026-08-12'
+  item_id: arxiv:2608.11083
+  relevant: true
+  basis: abstract
+  title: A Systematic Sample Size Analysis of ML-Based Path Loss Prediction for LPWAN
+- date: '2026-08-12'
+  item_id: arxiv:2608.11093
+  relevant: false
+  basis: title
+  title: 'Cross-View Feature Matching: Survey, Benchmarking, and Foundation-Model Perspectives'
+- date: '2026-08-12'
+  item_id: arxiv:2608.11110
+  relevant: true
+  basis: abstract
+  title: 'Actions Speak Louder than Words: Measuring Cross-Lingual Policy Retention in Tool-Using Agents'
+- date: '2026-08-12'
+  item_id: arxiv:2608.11162
+  relevant: false
+  basis: title
+  title: 'Hierarchical Empirical-Bayes Naive Bayes: Minimax Smoothing and Calibration with AODE Extension'
+- date: '2026-08-12'
+  item_id: arxiv:2608.11164
+  relevant: true
+  basis: title
+  title: Role of Personality in Conversational Information Seeking

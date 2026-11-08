@@ -970,3 +970,146 @@ def test_results_declares_ndcg_as_the_primary_metric(eval_env):
     assert "ΔnDCG@10" in table.split("베이스라인 대비 개선폭", 1)[1]
     # 열 위치로 값을 읽는 기존 테스트가 있으므로 P@10 은 지표 열 **뒤에** 붙어야 합니다
     assert header.index("Hit@5") < header.index("nDCG@10") < header.index("P@10")
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 임계값이 리랭커를 굶긴 사고 (2026-11-09 · docs/07_등급_골드셋.md §1)
+# ══════════════════════════════════════════════════════════════════════════
+
+
+def test_embedding_ranking_reports_how_many_the_reranker_received():
+    """★ 임계값이 후보를 전부 거르면 리랭커는 0건을 받고, 리랭킹 조건은 임베딩 조건과
+    **같은 랭킹**이 됩니다. 2026-11-09 에 실제로 그랬습니다 — 프로파일 임계값 0.42 에
+    1차 최고점이 0.299 라 719건 전부 탈락했고, `bge_m3_rerank` 가 `bge_m3` 와 소수점
+    네 자리까지 같은 수치로 표에 실렸습니다. **아무것도 터지지 않았습니다.**
+
+    손계산: 임계값 99.0 → 통과 0건 → stats["stage1_kept"] == 0. 랭킹은 리랭커를 거치지
+            않은 1차 순서 그대로 8건.
+            임계값을 끄면(None) top_n=7 이 적용돼 7건이 리랭커로 갑니다.
+
+    깨뜨리는 법: embedding_ranking 의 `stats["stage1_kept"] = len(head)` 를 지우면 빨간불.
+    확인일: 2026-11-09
+    """
+    base = {"interests": [{"id": "core", "text": f"radar eval {SIGNAL} interest", "weight": 1.0}]}
+    blocked = {**base, "selection": {"stage1_top_n": 7, "min_score_threshold": 99.0}}
+    allowed = {**base, "selection": {"stage1_top_n": 7, "min_score_threshold": None}}
+    embedder = PlantedEmbedder()
+    queryset = build_queryset(embedder, profile=blocked, profile_path="tmp")
+    items = [
+        {"id": f"d{index}", "title": f"paper {index}", "abstract": "unrelated quantum widgets"}
+        for index in range(8)
+    ]
+
+    starved: dict = {}
+    ranking = embedding_ranking(
+        items, embedder, queryset, reranker=PlantedReranker(), profile=blocked, stats=starved
+    )
+    assert starved["stage1_kept"] == 0, "임계값이 전부 걸렀는데 0 이 기록되지 않았습니다"
+    assert starved["candidates"] == 8
+    assert len(ranking) == 8, "꼬리를 버리면 안 됩니다 — 평가는 전체 순위를 봅니다"
+
+    fed: dict = {}
+    embedding_ranking(
+        items, embedder, queryset, reranker=PlantedReranker(), profile=allowed, stats=fed
+    )
+    assert fed["stage1_kept"] == 7, "임계값을 끄면 top_n 만 적용돼야 합니다"
+
+
+def test_results_warn_when_the_reranker_got_nothing():
+    """★ 리랭커가 0건을 받은 표에서 "ΔnDCG +0.0000" 은 '효과 없음' 이 아니라
+    '측정하지 않음' 입니다. 경고가 없으면 전자로 읽힙니다 — 이 프로젝트에서 가장
+    비싼 오독입니다 (작업규약 §7.2).
+
+    깨뜨리는 법: render_results 의 `starved` 블록을 지우면 빨간불.
+    확인일: 2026-11-09
+    """
+    date = "2026-08-12"
+    gold = {date: frozenset({"g1"})}
+    result = evaluate_condition(
+        "bge_m3_rerank", {date: ["g1"] + [f"x{i}" for i in range(9)]}, gold, {date: 719}
+    )
+    goldset = run_eval.Goldset(
+        path=Path("g.yaml"),
+        dates=(date,),
+        gold=gold,
+        labeled={date: 161},
+        generated_at="t",
+        recheck_sampled=0,
+        recheck_flipped=0,
+        miss_rate=None,
+    )
+    text = run_eval.render_results([result], goldset, {"stage1_kept": {date: 0}})
+    assert "리랭커가 1차에서 0건을 받았습니다" in text
+    assert date in text.split("리랭커가 1차에서 0건을 받았습니다", 1)[1].split("\n", 1)[0]
+
+    fed = run_eval.render_results([result], goldset, {"stage1_kept": {date: 30}})
+    assert "리랭커가 1차에서 0건" not in fed, "정상일 때 경고가 붙으면 경고가 무의미해집니다"
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 2등급 골드셋 (docs/07_등급_골드셋.md)
+# ══════════════════════════════════════════════════════════════════════════
+
+
+def test_goldset_gold_is_grade_two_when_grades_exist(eval_env):
+    """★ 등급이 있으면 평가의 정답은 **2등급만**입니다. 1등급(닿기만)은 오답입니다.
+
+    넓은 '관련' 로 재면 무작위 표본의 49%가 정답이어서 Hit@5 가 전 조건 1.0, nDCG@10 이
+    무작위 랭커 기대값과 구분되지 않았습니다 (2026-11-09 실측). 1등급을 정답에 넣으면
+    등급 패스를 돌린 의미가 사라집니다.
+
+    손계산: 픽스처의 08-12 정답 2건 중 하나에 grade 2, 다른 하나에 grade 1 →
+            gold 는 1건, broad_gold 는 2건.
+
+    깨뜨리는 법: load_goldset 의 `if int(row["grade"]) >= 2` 를 `>= 1` 로 바꾸면
+    gold 가 2건이 되어 빨간불.
+    확인일: 2026-11-09
+    """
+    doc = yaml.safe_load(eval_env["goldset"].read_text(encoding="utf-8"))
+    relevant = [row for row in doc["labels"] if row["date"] == "2026-08-12" and row["relevant"]]
+    assert len(relevant) == 2, "픽스처가 바뀌었습니다"
+    relevant[0]["grade"] = 2
+    relevant[1]["grade"] = 1
+    eval_env["goldset"].write_text(
+        yaml.safe_dump(doc, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
+
+    loaded = load_goldset(eval_env["goldset"])
+    assert loaded.graded_dates == ("2026-08-12",)
+    assert loaded.gold["2026-08-12"] == {relevant[0]["item_id"]}
+    assert loaded.broad_gold["2026-08-12"] == {row["item_id"] for row in relevant}
+    # 등급을 안 매긴 날은 넓은 '관련' 이 그대로 정답 — 조용히 0건이 되면 안 됩니다
+    assert loaded.gold["2026-08-14"] == loaded.broad_gold["2026-08-14"]
+
+
+def test_goldset_without_grades_keeps_the_broad_definition(eval_env):
+    """등급 패스 이전의 골드셋은 그대로 돌아야 합니다 (넓은 '관련' = 정답)."""
+    loaded = load_goldset(eval_env["goldset"])
+    assert loaded.graded_dates == ()
+    assert loaded.gold["2026-08-12"] == loaded.broad_gold["2026-08-12"]
+    assert len(loaded.gold["2026-08-12"]) == 2
+
+
+def test_results_declare_which_gold_definition_was_used(eval_env):
+    """★ 정답의 정의가 바뀐 사실이 표에 없으면, 정의가 다른 수치가 나란히 인용됩니다.
+
+    2026-11-09 에 '관련' → '2등급' 으로 바뀌었습니다. 같은 파일·같은 코드라도 정의가
+    다르면 비교할 수 없습니다.
+
+    깨뜨리는 법: render_results 에서 _gold_definition_lines 호출을 지우면 빨간불.
+    확인일: 2026-11-09
+    """
+    broad = _run(eval_env, conditions=["baseline"]).read_text(encoding="utf-8")
+    assert "등급 미적용" in broad
+    assert "python -m eval.label grade" in broad
+
+    doc = yaml.safe_load(eval_env["goldset"].read_text(encoding="utf-8"))
+    for row in doc["labels"]:
+        if row["relevant"]:
+            row["grade"] = 2
+    eval_env["goldset"].write_text(
+        yaml.safe_dump(doc, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
+    strict = _run(eval_env, conditions=["baseline"]).read_text(encoding="utf-8")
+    assert "2등급(실제로 읽었을 것)" in strict
+    assert "등급 미적용" not in strict
